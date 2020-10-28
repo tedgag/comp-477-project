@@ -4,9 +4,7 @@
 
 #ifndef COMP477PROJECT_SHADER_H
 #define COMP477PROJECT_SHADER_H
-#include <GL/glew.h>
-
-#include <glm/glm.hpp>
+#include "helpers/IncludeHeader.h"
 
 #include <string>
 #include <vector>

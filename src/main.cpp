@@ -1,10 +1,10 @@
 
 #include <stdio.h>
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include "helpers/IncludeHeader.h"
 
 #include "Simulation.h"
+#include "EventHandler.h"
 
 using namespace glm;
 
@@ -23,7 +23,7 @@ int main(){
 
     // Open a window and create its OpenGL context
     GLFWwindow* window; // (In the accompanying source code, this variable is global)
-    window = glfwCreateWindow( 800, 600, "Test", NULL, NULL);
+    window = glfwCreateWindow( SCR_WIDTH, SCR_HEIGHT, "Test", NULL, NULL);
     if( window == NULL ){
         fprintf( stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
         glfwTerminate();
@@ -43,12 +43,21 @@ int main(){
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.0f, 0.5f, 0.5f, 1.0f);
 
-    auto * sim = new Simulation;
+
+    auto * camera = new Camera(glm::vec3(0.0f, 0.0f, 6.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
+    auto * sim = new Simulation(camera);
+    EventHandler::init(window, camera);
+    // Main loop
+    float lastFrame = 0.0f;
+    float deltaTime = 0.0f;
 
     while (!glfwWindowShouldClose(window))
     {
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+        EventHandler::processInput(window, deltaTime);
         sim->run();
 
         glfwSwapBuffers(window);
@@ -59,3 +68,4 @@ int main(){
 
     return 0;
 }
+

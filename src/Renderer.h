@@ -6,13 +6,15 @@
 #define COMP477PROJECT_RENDERER_H
 
 #include "Model.h"
+#include "Camera.h"
 
 class Renderer {
     public:
-        Renderer(Shader* shader, std::vector<Model*> models);
+        Renderer(Shader* shader,Camera* camera, std::vector<Model*> models);
         void render();
     private:
         Shader* shader;
+        Camera* camera;
         std::vector<Model*> models;
 };
 

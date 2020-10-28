@@ -6,13 +6,21 @@
 #define COMP477PROJECT_SIMULATION_H
 
 #include "Renderer.h"
-
+#include "InstancedRenderer.h"
+struct Particle {
+    glm::vec3 position;
+    glm::vec3 scaling;
+};
 class Simulation {
     public:
-        Simulation();
+        Simulation(Camera * camera);
         void run();
     private:
-        Renderer * renderer;
+        std::vector<Model *> sceneModels;
+        std::vector<Particle> particles;
+        Renderer * sceneRenderer;
+        InstancedRenderer * particlesRenderer;
+        Model * particleModel;
 };
 
 

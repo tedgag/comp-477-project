@@ -5,9 +5,7 @@
 #ifndef COMP477PROJECT_MESH_H
 #define COMP477PROJECT_MESH_H
 
-#include <GL/glew.h>
-
-#include "glm/glm.hpp"
+#include "helpers/IncludeHeader.h"
 
 #include <string>
 #include <vector>
@@ -28,13 +26,13 @@ class Mesh {
 
         std::vector<unsigned int> indices;
         GLuint texture;
-
+        GLuint VAO,VBO,EBO = 0;
         Mesh();
         Mesh(const std::string& imagePath, const std::string& modelPath);
         ~Mesh();
         void draw(Shader &shader);
     private:
-        GLuint VAO,VBO,EBO = 0;
+
         GLuint loadTexture(const std::string& path);
         bool loadAssImp(const std::string& path);
 };
