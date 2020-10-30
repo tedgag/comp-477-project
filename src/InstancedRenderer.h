@@ -14,7 +14,7 @@ public:
 
     InstancedRenderer(Shader * shader, Camera * camera, Model * model);
 
-    void render(std::vector<glm::mat4> instances);
+    void render(std::vector<glm::vec3> particlesPositions);
 private:
     Shader* shader;
     Camera * camera;

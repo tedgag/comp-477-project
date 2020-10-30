@@ -31,7 +31,7 @@ public:
     void processKeyboard(std::string, float deltaTime);
     void processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
     void processMouseScroll(float yoffset);
-    void setViewMatrix(Shader * shader);
+    void setShaderUniforms(Shader * shader);
 private:
     void updateCameraVectors();
 };

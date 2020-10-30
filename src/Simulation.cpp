@@ -15,7 +15,7 @@ Simulation::Simulation(Camera * camera) {
             "../resources/shaders/particles_shader.frag"
     );
     Mesh * particleMesh = new Mesh(
-            "../resources/assets/textures/cardboard.jpg",
+            "../resources/assets/textures/blue.jpg",
             "../resources/assets/models/sphere.obj"
             );
     particleModel = new Model(particleMesh);
@@ -24,7 +24,6 @@ Simulation::Simulation(Camera * camera) {
             for (int k =0 ; k<40 ; k++) {
                 Particle particle;
                 particle.position = glm::vec3((float)i,(float)j,(float)k);
-                particle.scaling = glm::vec3(0.1f,0.1f,0.1f);
                 particles.push_back(particle);
             }
         }
@@ -35,15 +34,13 @@ Simulation::Simulation(Camera * camera) {
 }
 
 void Simulation::run() {
-    std::vector<glm::mat4> particleInstances;
+    std::vector<glm::vec3> positions;
     for (auto & particle : particles) {
-        glm::mat4 model = glm::mat4(1.0f);
-        particle.position += glm::vec3(0.0f, 0.01f, 0.0f);
-        model = glm::translate(model, particle.position);
-        model = glm::scale(model, particle.scaling);
-        particleInstances.push_back(model);
-    }
-    particlesRenderer->render(particleInstances);
 
+        //particle.position += glm::vec3(0.0f, 0.01f, 0.0f);
+        positions.push_back(particle.position);
+
+    }
     //sceneRenderer->render();
+    particlesRenderer->render(positions);
 }
