@@ -19,27 +19,30 @@ Simulation::Simulation(Camera * camera) {
             "../resources/assets/models/sphere.obj"
             );
     particleModel = new Model(particleMesh);
-    for (int i =0 ; i<40 ; i++) {
-        for (int j =0 ; j<40 ; j++) {
-            for (int k =0 ; k<40 ; k++) {
-                Particle particle;
-                particle.position = glm::vec3((float)i,(float)j,(float)k);
+    for (int i =0 ; i<10 ; i++) {
+        for (int j =0 ; j<10 ; j++) {
+            for (int k =0 ; k<10 ; k++) {
+                Particle * particle = new Particle();
+                particle->position = glm::vec3((float)i/10,(float)j/10,(float)k/10);
                 particles.push_back(particle);
             }
         }
     }
+    grid = new Grid(glm::vec3(64.0f,64.0f,64.0f), 0.5f);
+
     sceneModels.push_back(particleModel);
     sceneRenderer = new Renderer(sceneShader, camera, sceneModels);
     particlesRenderer = new InstancedRenderer(particlesShader, camera, particleModel);
+
 }
 
 void Simulation::run() {
+    grid->buildHashTable(particles);
     std::vector<glm::vec3> positions;
     for (auto & particle : particles) {
-
         //particle.position += glm::vec3(0.0f, 0.01f, 0.0f);
-        positions.push_back(particle.position);
-
+        particle->neighbors = grid->findNeighbors(particle, 0.5f);
+        positions.push_back(particle->position);
     }
     //sceneRenderer->render();
     particlesRenderer->render(positions);

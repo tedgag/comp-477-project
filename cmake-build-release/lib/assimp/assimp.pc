@@ -1,0 +1,9 @@
+libdir=C:/Program Files (x86)/comp477project/lib
+includedir=C:/Program Files (x86)/comp477project/include
+
+Name: comp477project
+Description: Import various well-known 3D model formats in an uniform manner.
+Version: 5.0.1
+Libs: -L${libdir} -lassimp
+Libs.private:  
+Cflags: -I${includedir}

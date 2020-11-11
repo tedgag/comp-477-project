@@ -1,0 +1,26 @@
+"C:\Program Files\JetBrains\CLion 2020.2.4\bin\cmake\win\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Release -G "CodeBlocks - MinGW Makefiles" D:\Desktop\Workspace\comp-477-project
+-- Could NOT find Vulkan (missing: VULKAN_LIBRARY VULKAN_INCLUDE_DIR) 
+-- Could NOT find Doxygen (missing: DOXYGEN_EXECUTABLE) 
+-- Using Win32 for window creation
+-- GLM is a header only library, no need to build it. Set the option GLM_TEST_ENABLE with ON to build and run the test bench
+-- Shared libraries disabled
+-- Looking for ZLIB...
+-- Could NOT find PkgConfig (missing: PKG_CONFIG_EXECUTABLE) 
+-- Could not locate ZLIB
+-- compiling zlib from sources
+INFO Hunter enabled or RT-extension not found. glTF import/export will be built without Open3DGC-compression.
+-- Enabled importer formats: AMF 3DS AC ASE ASSBIN B3D BVH COLLADA DXF CSM HMP IRRMESH IRR LWO LWS M3D MD2 MD3 MD5 MDC MDL NFF NDO OFF OBJ OGRE OPENGEX PLY MS3D COB BLEND IFC XGL FBX Q3D Q3BSP RAW SIB SMD STL TERRAGEN 3D X X3D GLTF 3MF MMD
+-- Disabled importer formats:
+-- Enabled exporter formats: OBJ OPENGEX PLY 3DS ASSBIN ASSXML M3D COLLADA FBX STL X X3D GLTF 3MF ASSJSON STEP
+-- Disabled exporter formats:
+CMake Warning (dev) at lib/assimp/test/CMakeLists.txt:223 (target_sources):
+  Policy CMP0076 is not set: target_sources() command converts relative paths
+  to absolute.  Run "cmake --help-policy CMP0076" for policy details.  Use
+  the cmake_policy command to set the policy and suppress this warning.
+
+  An interface source of target "unit" has a relative path.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Configuring done
+-- Generating done
+-- Build files have been written to: D:/Desktop/Workspace/comp-477-project/cmake-build-release

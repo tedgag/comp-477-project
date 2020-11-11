@@ -7,19 +7,18 @@
 
 #include "Renderer.h"
 #include "InstancedRenderer.h"
-struct Particle {
-    glm::vec3 position;
-};
+#include "Grid.h"
 class Simulation {
     public:
         Simulation(Camera * camera);
         void run();
     private:
         std::vector<Model *> sceneModels;
-        std::vector<Particle> particles;
+        std::vector<Particle *> particles;
         Renderer * sceneRenderer;
         InstancedRenderer * particlesRenderer;
         Model * particleModel;
+        Grid * grid;
 };
 
 
