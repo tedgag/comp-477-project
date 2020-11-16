@@ -9,16 +9,16 @@
 
 class Model {
     public:
-        Model(Mesh * mesh, glm::vec3 position, glm::vec3 rotation, glm::vec3 scaling);
-        Model(Mesh * mesh);
+        Model(Mesh * mesh, glm::vec3 position, glm::vec3 rotation, glm::vec3 scaling, glm::vec3 color);
+        Model(Mesh * mesh, glm::vec3 color);
         
         glm::mat4 getModelMatrix();
         void draw(Shader& shader);
         Mesh * mesh;
-    private:
         glm::vec3 position = glm::vec3(0.0f);
         glm::vec3 rotation = glm::vec3(0.0f);
         glm::vec3 scaling = glm::vec3(1.0f);
+        glm::vec3 color = glm::vec3(1.0f);
 };
 
 

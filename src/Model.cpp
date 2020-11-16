@@ -9,15 +9,10 @@
 using namespace glm;
 using namespace std;
 
-Model::Model(Mesh * mesh, glm::vec3 position, glm::vec3 rotation, glm::vec3 scaling) {
-    this->mesh = mesh;
-    this->position = position;
-    this->rotation = rotation;
-    this->scaling = scaling;
-}
-Model::Model(Mesh * mesh) {
-    this->mesh = mesh;
-}
+Model::Model(Mesh * mesh,glm::vec3 position,glm::vec3 rotation,glm::vec3 scaling,glm::vec3 color) :
+             mesh{mesh}, position{position},rotation{rotation}, scaling{scaling}, color{color} {}
+
+Model::Model(Mesh * mesh, glm::vec3 color) :  mesh{mesh} , color{color} {}
 
 glm::mat4 Model::getModelMatrix() {
     glm::mat4 model = glm::mat4(1.0f);
@@ -32,6 +27,7 @@ glm::mat4 Model::getModelMatrix() {
 void Model::draw(Shader &shader) {
     glm::mat4 model = getModelMatrix();
     shader.setMat4("model", model);
+    shader.setVec3("color", color);
     mesh->draw(shader);
 }
 

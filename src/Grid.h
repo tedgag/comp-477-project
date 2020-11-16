@@ -11,13 +11,13 @@ private:
     glm::vec3 dimensions;
     float cellSize;
     float cellCount;
-    std::vector<std::vector<Particle *>> hashTable;
-    glm::vec3 getCellPos(glm::vec3 position);
-    int getCellHash(glm::vec3 position);
+    std::vector<std::vector<glm::vec3>> cells;
+    glm::vec3 getCellPos(glm::vec3 position) const;
+    int getCellHash(glm::vec3 position) const;
 public:
     Grid(glm::vec3 dimensions, float cellSize);
-    void buildHashTable(std::vector<Particle *> particles);
-    std::vector<Particle *> findNeighbors(Particle * p, float rad);
+    void findNeighbors(std::vector<glm::vec3> &positions, float rad, std::vector<std::vector<glm::vec3>> &neighbors);
+    std::vector<glm::vec3> getCellInstances();
 };
 
 #endif //COMP477PROJECT_GRID_H

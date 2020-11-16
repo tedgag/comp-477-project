@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.17)
 project(comp477project)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 # Add source files
 file(GLOB_RECURSE SOURCE_FILES
         ${CMAKE_SOURCE_DIR}/src/*.c
@@ -15,11 +15,16 @@ file(GLOB_RECURSE HEADER_FILES
         ${CMAKE_SOURCE_DIR}/lib/stb/stb_image.h
         )
 # Define the executable
-add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES} src/InstancedRenderer.cpp src/InstancedRenderer.h src/Grid.cpp src/Grid.h src/Particle.h)
+add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
+
 # Configure assets header file
 configure_file(src/helpers/RootDir.h.in src/helpers/RootDir.h)
 include_directories(${CMAKE_BINARY_DIR}/src)
+# OpenMP
+find_package(OpenMP)
+target_link_libraries(comp477project PRIVATE OpenMP::OpenMP_CXX)
 # glfw
+
 add_subdirectory(lib/glfw EXCLUDE_FROM_ALL)
 target_link_libraries(comp477project PRIVATE glfw)
 

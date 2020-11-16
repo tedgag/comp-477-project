@@ -1,3 +1,0 @@
-"C:\Program Files\JetBrains\CLion 2020.2.4\bin\cmake\win\bin\cmake.exe" -E rm -f CMakeFiles\libglew_shared.dir/objects.a
-C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\ar.exe cr CMakeFiles\libglew_shared.dir/objects.a @CMakeFiles\libglew_shared.dir\objects1.rsp
-C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\gcc.exe  -O3 -DNDEBUG  -shared -o ..\..\bin\libglew.dll -Wl,--out-implib,..\liblibglew_shared.dll.a -Wl,--major-image-version,0,--minor-image-version,0 -Wl,--whole-archive CMakeFiles\libglew_shared.dir/objects.a -Wl,--no-whole-archive @CMakeFiles\libglew_shared.dir\linklibs.rsp

@@ -4,46 +4,44 @@
 
 #include <iostream>
 #include "Simulation.h"
+#include <algorithm>
+#include <execution>
 
 Simulation::Simulation(Camera * camera) {
-    auto* sceneShader = new Shader(
+    sceneShader = new Shader(
             "../resources/shaders/scene_shader.vert",
             "../resources/shaders/scene_shader.frag"
             );
-    auto* particlesShader = new Shader(
+    particleShader = new Shader(
             "../resources/shaders/particles_shader.vert",
             "../resources/shaders/particles_shader.frag"
     );
-    Mesh * particleMesh = new Mesh(
-            "../resources/assets/textures/blue.jpg",
-            "../resources/assets/models/sphere.obj"
-            );
-    particleModel = new Model(particleMesh);
-    for (int i =0 ; i<10 ; i++) {
-        for (int j =0 ; j<10 ; j++) {
-            for (int k =0 ; k<10 ; k++) {
-                Particle * particle = new Particle();
-                particle->position = glm::vec3((float)i/10,(float)j/10,(float)k/10);
-                particles.push_back(particle);
+    Mesh * particleMesh = new Mesh("../resources/assets/models/sphere.obj");
+    Mesh * boxMesh = new Mesh("../resources/assets/models/box.obj");
+    Model * particleModel = new Model(particleMesh, particleColor);
+    Model * boxModel = new Model(boxMesh,  (boxDimensions)/2.0f , glm::vec3(0.0f), (boxDimensions)/2.0f, particleColor);
+    glm::vec3 offset = glm::vec3(1.5,1.5,1.5);
+    glm::vec3 initialFluid = glm::vec3(10,20,10);
+    for (int i =0 ; i<(int)initialFluid.x ; i++) {
+        for (int j =0 ; j<(int)initialFluid.y; j++) {
+            for (int k =0 ; k<(int)initialFluid.z ; k++) {
+                positions.push_back(glm::vec3((float)i/2,(float)j/2,(float)k/2) + offset);
             }
         }
     }
-    grid = new Grid(glm::vec3(64.0f,64.0f,64.0f), 0.5f);
-
-    sceneModels.push_back(particleModel);
+    grid = new Grid(glm::vec3(boxDimensions), 1.0f);
+    cellPositions = grid->getCellInstances();
+    sceneModels.push_back(boxModel);
     sceneRenderer = new Renderer(sceneShader, camera, sceneModels);
-    particlesRenderer = new InstancedRenderer(particlesShader, camera, particleModel);
-
+    particlesRenderer = new InstancedRenderer(particleShader, camera, particleModel);
+    neighbors.resize(positions.size());
 }
 
 void Simulation::run() {
-    grid->buildHashTable(particles);
-    std::vector<glm::vec3> positions;
-    for (auto & particle : particles) {
-        //particle.position += glm::vec3(0.0f, 0.01f, 0.0f);
-        particle->neighbors = grid->findNeighbors(particle, 0.5f);
-        positions.push_back(particle->position);
-    }
-    //sceneRenderer->render();
+    grid->findNeighbors(positions, particleRadius * 4, neighbors);
+    sceneRenderer->render();
+
+    particleShader->use();
+    particleShader->setFloat("size", particleRadius);
     particlesRenderer->render(positions);
 }

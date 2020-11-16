@@ -17,9 +17,7 @@ using namespace glm;
 using namespace std;
 
 Mesh::Mesh() = default;
-Mesh::Mesh(const string& imagePath, const string& modelPath) {
-
-    texture = loadTexture(imagePath);
+Mesh::Mesh(const string& modelPath) {
     loadAssImp(modelPath);
     // create buffers/arrays
     glGenVertexArrays(1, &VAO);
@@ -39,9 +37,6 @@ Mesh::Mesh(const string& imagePath, const string& modelPath) {
     // vertex normals
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-    // vertex texture coords
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
 
 }
 Mesh::~Mesh()
@@ -50,6 +45,7 @@ Mesh::~Mesh()
     glDeleteVertexArrays(1, &VAO);
 }
 /* Method to load an external texture using the stb_image header file. */
+
 GLuint Mesh::loadTexture(const string& path) {
     unsigned int texture;
     glGenTextures(1, &texture);
@@ -87,16 +83,13 @@ GLuint Mesh::loadTexture(const string& path) {
 }
 
 void Mesh::draw(Shader &shader) {
-    shader.setFloat("diffuseTexture", 0);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glActiveTexture(GL_TEXTURE0);
-
     // draw mesh
     glBindVertexArray(VAO);
     //glDrawArrays(GL_TRIANGLES, 0, 36);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
+
 bool Mesh::loadAssImp(const string& path){
 
     vector<vec3> verts;
@@ -105,7 +98,7 @@ bool Mesh::loadAssImp(const string& path){
 
     Assimp::Importer importer;
 
-    const aiScene* scene = importer.ReadFile(path, 0/*aiProcess_JoinIdenticalVertices | aiProcess_SortByPType*/);
+    const aiScene* scene = importer.ReadFile(path, 0);
     if( !scene) {
         fprintf( stderr, importer.GetErrorString());
         getchar();
@@ -131,6 +124,7 @@ bool Mesh::loadAssImp(const string& path){
             vertex.normal = vector;
         }
         // texture coordinates
+        /*
         if(mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
         {
             glm::vec2 vec;
@@ -143,6 +137,8 @@ bool Mesh::loadAssImp(const string& path){
         else
             vertex.texCoords = glm::vec2(0.0f, 0.0f);
 
+
+         */
         vertices.push_back(vertex);
     }
 
