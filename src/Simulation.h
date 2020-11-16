@@ -22,10 +22,7 @@ class Simulation {
         Grid * grid;
         Shader * sceneShader;
         Shader * particleShader;
-        std::vector<glm::vec3> positions;
-        std::vector<glm::vec3> velocities;
-        std::vector<glm::vec3> accelerations;
-        std::vector<std::vector<int>> neighbors;
+        std::vector<Particle *> particles;
         std::size_t nbParticles;
         float particleRadius = 0.25f;
         float particleMass = 0.25f;

@@ -25,7 +25,9 @@ Simulation::Simulation(Camera * camera) {
     for (int i =0 ; i<(int)initialFluid.x ; i++) {
         for (int j =0 ; j<(int)initialFluid.y; j++) {
             for (int k =0 ; k<(int)initialFluid.z ; k++) {
-                positions.push_back(glm::vec3((float)i/2,(float)j/2,(float)k/2) + offset);
+                auto * p = new Particle();
+                p->position = glm::vec3((float)i/2,(float)j/2,(float)k/2) + offset;
+                particles.push_back(p);
             }
         }
     }
@@ -33,61 +35,62 @@ Simulation::Simulation(Camera * camera) {
     sceneModels.push_back(boxModel);
     sceneRenderer = new Renderer(sceneShader, camera, sceneModels);
     particlesRenderer = new InstancedRenderer(particleShader, camera, particleModel, particleRadius);
-    neighbors.resize(positions.size());
-    velocities.resize(positions.size());
-    accelerations.resize(positions.size());
 }
 
 void Simulation::run() {
-    grid->findNeighbors(positions, particleRadius * 4, neighbors);
+    grid->findNeighbors(particles, particleRadius * 4);
 
     computeForces();
     float deltaTime = 0.05f * particleRadius;
     timeIntegration(deltaTime);
     collisionHandling();
+    std::vector<glm::vec3> positions;
+    for (auto & p : particles) {
+        positions.push_back(p->position);
+    }
     particlesRenderer->render(positions);
     sceneRenderer->render();
 }
 void Simulation::computeForces() {
     #pragma omp parallel for
-    for (int i =0 ; i<accelerations.size(); i++) {
-        accelerations[i].y = g;
+    for (int i =0 ; i<particles.size(); i++) {
+        //particles[i]->acceleration.y = g;
     }
 
 }
 void Simulation::timeIntegration( float deltaTime) {
     #pragma omp parallel for
-    for (int i =0 ; i<positions.size(); i++) {
-        velocities[i] += accelerations[i] * deltaTime;
-        positions[i] += velocities[i] * deltaTime;
+    for (int i =0 ; i<particles.size(); i++) {
+        particles[i]->velocity += particles[i]->acceleration * deltaTime;
+        particles[i]->position += particles[i]->velocity * deltaTime;
     }
 }
 void Simulation::collisionHandling() {
     #pragma omp parallel for
-    for (int i =0 ; i<positions.size(); i++) {
-        if (positions[i].x-displacement< 0.0f) {
-            velocities[i].x *= boundDamping;
-            positions[i].x = displacement;
+    for (int i =0 ; i<particles.size(); i++) {
+        if (particles[i]->position.x-displacement< 0.0f) {
+            particles[i]->velocity.x *= boundDamping;
+            particles[i]->position.x = displacement;
         }
-        if (positions[i].x + displacement >= boundaries.x) {
-            velocities[i].x *= boundDamping;
-            positions[i].x = boundaries.x - displacement;
+        if (particles[i]->position.x + displacement >= boundaries.x) {
+            particles[i]->velocity.x *= boundDamping;
+            particles[i]->position.x = boundaries.x - displacement;
         }
-        if (positions[i].y -displacement< 0.0f) {
-            velocities[i].y *= boundDamping;
-            positions[i].y = displacement;
+        if (particles[i]->position.y -displacement< 0.0f) {
+            particles[i]->velocity.y *= boundDamping;
+            particles[i]->position.y = displacement;
         }
-        if (positions[i].y + displacement>= boundaries.y) {
-            velocities[i].y *= boundDamping;
-            positions[i].y = boundaries.y - displacement;
+        if (particles[i]->position.y + displacement>= boundaries.y) {
+            particles[i]->velocity.y *= boundDamping;
+            particles[i]->position.y = boundaries.y - displacement;
         }
-        if (positions[i].z - displacement< 0.0f) {
-            velocities[i].z *= boundDamping;
-            positions[i].z = displacement;
+        if (particles[i]->position.z - displacement< 0.0f) {
+            particles[i]->velocity.z *= boundDamping;
+            particles[i]->position.z = displacement;
         }
-        if (positions[i].z + displacement >= boundaries.z) {
-            velocities[i].z *= boundDamping;
-            positions[i].z = boundaries.z - displacement;
+        if (particles[i]->position.z + displacement >= boundaries.z) {
+            particles[i]->velocity.z *= boundDamping;
+            particles[i]->position.z = boundaries.z - displacement;
         }
     }
 }

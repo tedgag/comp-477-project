@@ -8,7 +8,8 @@
 #include <vector>
 #endif //COMP477PROJECT_PARTICLE_H
 struct Particle {
-    glm::vec3 position;
-    glm::vec3 velocity;
-    std::vector<Particle> neighbors;
+    glm::vec3 position = glm::vec3(0.0f);
+    glm::vec3 velocity = glm::vec3(0.0f);
+    glm::vec3 acceleration = glm::vec3(0.0f);
+    std::vector<Particle *> neighbors;
 };

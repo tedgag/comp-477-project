@@ -16,7 +16,7 @@ private:
     int getCellHash(glm::vec3 position) const;
 public:
     Grid(glm::vec3 dimensions, float cellSize);
-    void findNeighbors(std::vector<glm::vec3> &positions, float rad, std::vector<std::vector<int>> &neighbors);
+    void findNeighbors(std::vector<Particle *> &particles, float rad);
     std::vector<glm::vec3> getCellInstances();
 };
 

@@ -26,23 +26,23 @@ int Grid::getCellHash(glm::vec3 cellPos) const {
 
     return hash;
 }
-void Grid::findNeighbors(std::vector<glm::vec3> &positions, float rad, std::vector<std::vector<int>> &neighbors) {
+void Grid::findNeighbors(std::vector<Particle *> &particles, float rad) {
 
     #pragma omp parallel for
-    for(int n = 0; n < neighbors.size(); n++) {
-        neighbors[n].clear();
+    for(int p = 0; p < particles.size(); p++) {
+        particles[p]->neighbors.clear();
     }
     #pragma omp parallel for
     for(int c = 0; c < cells.size(); c++) {
         cells[c].clear();
     }
 
-    for (int p = 0; p < positions.size(); p++) {
-        cells[getCellHash(getCellPos(positions[p]))].push_back(p);
+    for (int p = 0; p < particles.size(); p++) {
+        cells[getCellHash(getCellPos(particles[p]->position))].push_back(p);
     }
     #pragma omp parallel for
-    for(int p = 0; p < positions.size(); p++) {
-        glm::vec3 cellPos = getCellPos(positions[p]);
+    for(int p = 0; p < particles.size(); p++) {
+        glm::vec3 cellPos = getCellPos(particles[p]->position);
 
         for (int k = -1; k <= 1; k++) {
             for (int j = -1; j <= 1; j++) {
@@ -50,9 +50,9 @@ void Grid::findNeighbors(std::vector<glm::vec3> &positions, float rad, std::vect
                     int hash = getCellHash(cellPos + glm::vec3((float) i, (float) j, (float) k) / cellSize);
                     if (hash != -1) {
                         for (auto &n : cells[hash]) {
-                            float dist = glm::distance(positions[n], positions[p]);
+                            float dist = glm::distance(particles[p]->position, particles[n]->position);
                             if (dist <= rad && dist > 0)
-                                neighbors[p].push_back(n);
+                                particles[p]->neighbors.push_back(particles[n]);
                         }
                     }
                 }
