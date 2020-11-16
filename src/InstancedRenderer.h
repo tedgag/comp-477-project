@@ -12,7 +12,7 @@
 class InstancedRenderer {
 public:
 
-    InstancedRenderer(Shader * shader, Camera * camera, Model * model);
+    InstancedRenderer(Shader *shader, Camera *camera, Model * model, float size);
 
     void render(std::vector<glm::vec3> particlesPositions);
 private:
@@ -20,6 +20,7 @@ private:
     Camera * camera;
     Model* model;
     GLuint modelsBuffer;
+    float size;
     void setup();
 };
 

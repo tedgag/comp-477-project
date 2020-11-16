@@ -44,7 +44,7 @@ int main(){
     glClearColor(0.0f, 0.5f, 0.5f, 1.0f);
 
 
-    auto * camera = new Camera(glm::vec3(0.0f, 0.0f, 6.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
+    auto * camera = new Camera(glm::vec3(0.0f, 6.0f, 6.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
     auto * sim = new Simulation(camera);
     EventHandler::init(window, camera);
     // Main loop

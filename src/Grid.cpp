@@ -16,9 +16,9 @@ glm::vec3 Grid::getCellPos(glm::vec3 pos) const{
 
 int Grid::getCellHash(glm::vec3 cellPos) const {
 
-    if((cellPos.x < 0)||(cellPos.x >= dimensions.x)||
-        (cellPos.y < 0)||(cellPos.y >= dimensions.y)||
-        (cellPos.z < 0)||(cellPos.z >= dimensions.z)) {
+    if((cellPos.x < 0)||(cellPos.x >= dimensions.x/cellSize)||
+        (cellPos.y < 0)||(cellPos.y >= dimensions.y/cellSize)||
+        (cellPos.z < 0)||(cellPos.z >= dimensions.z/cellSize)) {
         return -1;
     }
 
@@ -26,7 +26,7 @@ int Grid::getCellHash(glm::vec3 cellPos) const {
 
     return hash;
 }
-void Grid::findNeighbors(std::vector<glm::vec3> &positions, float rad, std::vector<std::vector<glm::vec3>> &neighbors) {
+void Grid::findNeighbors(std::vector<glm::vec3> &positions, float rad, std::vector<std::vector<int>> &neighbors) {
 
     #pragma omp parallel for
     for(int n = 0; n < neighbors.size(); n++) {
@@ -37,22 +37,22 @@ void Grid::findNeighbors(std::vector<glm::vec3> &positions, float rad, std::vect
         cells[c].clear();
     }
 
-    for (auto & pos : positions) {
-        cells[getCellHash(getCellPos(pos))].push_back(pos);
+    for (int p = 0; p < positions.size(); p++) {
+        cells[getCellHash(getCellPos(positions[p]))].push_back(p);
     }
     #pragma omp parallel for
     for(int p = 0; p < positions.size(); p++) {
-
         glm::vec3 cellPos = getCellPos(positions[p]);
+
         for (int k = -1; k <= 1; k++) {
             for (int j = -1; j <= 1; j++) {
                 for (int i = -1; i <= 1; i++) {
                     int hash = getCellHash(cellPos + glm::vec3((float) i, (float) j, (float) k) / cellSize);
                     if (hash != -1) {
-                        for (auto &neighbor : cells[hash]) {
-                            float dist = glm::distance(neighbor, positions[p]);
+                        for (auto &n : cells[hash]) {
+                            float dist = glm::distance(positions[n], positions[p]);
                             if (dist <= rad && dist > 0)
-                                neighbors[p].push_back(neighbor);
+                                neighbors[p].push_back(n);
                         }
                     }
                 }

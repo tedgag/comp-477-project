@@ -12,6 +12,9 @@ class Simulation {
     public:
         Simulation(Camera * camera);
         void run();
+        void timeIntegration( float deltaTime);
+        void computeForces();
+        void collisionHandling();
     private:
         std::vector<Model *> sceneModels;
         Renderer * sceneRenderer;
@@ -20,12 +23,17 @@ class Simulation {
         Shader * sceneShader;
         Shader * particleShader;
         std::vector<glm::vec3> positions;
-        std::vector<glm::vec3> cellPositions;
-        std::vector<std::vector<glm::vec3>> neighbors;
+        std::vector<glm::vec3> velocities;
+        std::vector<glm::vec3> accelerations;
+        std::vector<std::vector<int>> neighbors;
         std::size_t nbParticles;
         float particleRadius = 0.25f;
+        float particleMass = 0.25f;
+        const float g = -9.81f;
         glm::vec3 particleColor= glm::vec3(0.5f,0.5f,0.5f);
-        glm::vec3 boxDimensions = glm::vec3(15.0f,20.0f,15.0f);
+        glm::vec3 boundaries = glm::vec3(15.0f,20.0f,15.0f);
+        const float boundDamping = -0.5f;
+        const float displacement = 0.25f;
 };
 
 

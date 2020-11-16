@@ -5,10 +5,8 @@
 #include <iostream>
 #include "InstancedRenderer.h"
 
-InstancedRenderer::InstancedRenderer(Shader *shader, Camera *camera, Model * model) {
-    this->shader = shader;
-    this->camera = camera;
-    this->model = model;
+InstancedRenderer::InstancedRenderer(Shader *shader, Camera *camera, Model * model, float size) :
+    shader{shader}, camera{camera}, model{model}, size{size} {
     setup();
 }
 
@@ -16,6 +14,7 @@ void InstancedRenderer::render(std::vector<glm::vec3> instances) {
     shader->use();
     camera->setShaderUniforms(shader);
     shader->setVec3("color", model->color);
+    shader->setFloat("size", size);
     glBindBuffer(GL_ARRAY_BUFFER, modelsBuffer);
     glBufferData(GL_ARRAY_BUFFER, instances.size() * sizeof(glm::vec3), &instances[0], GL_STATIC_DRAW);
     glBindVertexArray(model->mesh->VAO);

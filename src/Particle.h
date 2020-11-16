@@ -9,5 +9,6 @@
 #endif //COMP477PROJECT_PARTICLE_H
 struct Particle {
     glm::vec3 position;
-    std::vector<glm::vec3> neighbors;
+    glm::vec3 velocity;
+    std::vector<Particle> neighbors;
 };
