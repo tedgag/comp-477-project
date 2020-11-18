@@ -13,24 +13,32 @@ class Simulation {
         Simulation(Camera * camera);
         void run();
         void timeIntegration( float deltaTime);
+        void computeDensityPressure();
         void computeForces();
         void collisionHandling();
+        float poly6();
+        float spiky();
     private:
         std::vector<Model *> sceneModels;
         Renderer * sceneRenderer;
         InstancedRenderer * particlesRenderer;
+        InstancedRenderer * gridRenderer;
         Grid * grid;
         Shader * sceneShader;
         Shader * particleShader;
         std::vector<Particle *> particles;
         std::size_t nbParticles;
         float particleRadius = 0.25f;
-        float particleMass = 0.25f;
+        float particleMass = 120.0f;
+        float h, hs;
+        const double pi = 3.14159265358979323846;
         const float g = -9.81f;
-        glm::vec3 particleColor= glm::vec3(0.5f,0.5f,0.5f);
+        const float restDensity = 1000.0f;
+        glm::vec3 particleColor= glm::vec3(0.0,0.50f,1.0f);
         glm::vec3 boundaries = glm::vec3(15.0f,20.0f,15.0f);
         const float boundDamping = -0.5f;
         const float displacement = 0.25f;
+        const float viscosity = 40.0f;
 };
 
 
