@@ -12,6 +12,7 @@ struct Particle {
     glm::vec3 velocity = glm::vec3(0.0f);
     glm::vec3 acceleration = glm::vec3(0.0f);
     std::vector<Particle *> neighbors;
+    std::vector<glm::vec3> ghosts;
     float pressure;
     float density;
 };
