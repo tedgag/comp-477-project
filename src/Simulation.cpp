@@ -19,7 +19,7 @@ Simulation::Simulation(Camera * camera) {
     Mesh * boxMesh = new Mesh("../resources/assets/models/box.obj");
     h = 3*particleRadius;
     hs = h * h;
-    boundaries = glm::vec3(10.0f,25.0f,20.0f) * h;
+    boundaries = glm::vec3(10.0f,20.0f,20.0f) * h;
     Model * particleModel = new Model(particleMesh, particleColor);
     Model * boxModel = new Model(
             boxMesh,
@@ -27,7 +27,7 @@ Simulation::Simulation(Camera * camera) {
             glm::vec3(0.0f),
             (boundaries)/2.0f,
             glm::vec3(0.5f,0.5f,0.5f));
-    glm::vec3 offset = glm::vec3(boundaries.x/2.0f,6.0f, 1.90f);
+    glm::vec3 offset = glm::vec3(boundaries.x/2.0f,5.0f, 2.0f);
     glm::vec3 initialFluid = glm::vec3(20, 30,10);
     for (int i =-(int)initialFluid.x/2 ; i<(int)initialFluid.x/2 ; i++) {
         for (int j =-(int)initialFluid.y/2 ; j<(int)initialFluid.y/2; j++) {
@@ -51,26 +51,23 @@ void Simulation::run() {
     grid->findNeighbors(particles, h);
     computeDensityPressure();
     float deltaTime = 0.05f * particleRadius;
-    computeForces(deltaTime);
+    computeForces();
     timeIntegration(deltaTime);
     grid->collisionHandling(particles);
     std::vector<glm::vec3> positions;
     for (int i =0 ; i<particles.size(); i++) {
-        auto * p = particles[i];
-
-
-
+        Particle * p = particles[i];
         positions.push_back(p->position);
     }
     particlesRenderer->render(positions);
 
-    //gridRenderer->render(grid->getCellInstances());
+    gridRenderer->render(grid->getCellInstances());
     sceneRenderer->render();
 }
 void Simulation::computeDensityPressure() {
     #pragma omp parallel for
     for (int i =0 ; i<particles.size(); i++) {
-        auto p = particles[i];
+        Particle * p = particles[i];
         p->density = poly6()*pow(hs, 3.0f);
         for(int j =0 ; j<p->neighbors.size(); j++)
         {
@@ -101,17 +98,17 @@ void Simulation::computeDensityPressure() {
         */
     }
 }
-void Simulation::computeForces(float deltaTime) {
+void Simulation::computeForces() {
     #pragma omp parallel for
     for (int i =0 ; i<particles.size(); i++) {
-        auto accel = glm::vec3(0.0f);
+        glm::vec3 accel = glm::vec3(0.0f,0.0f,0.0f);
 
-        auto p = particles[i];
+        Particle * p = particles[i];
 
         float kp = p->pressure / (p->density * p->density);
         for (int j =0 ; j<p->neighbors.size(); j++) {
-            auto n = p->neighbors[j];
-            auto r = glm::length(p->position - n->position);
+            Particle * n = p->neighbors[j];
+            float r = glm::length(p->position - n->position);
             float r2 = r * r;
             if (r2 <= hs && r2 > 0) {
                 // Pressure forces
@@ -125,6 +122,7 @@ void Simulation::computeForces(float deltaTime) {
             }
 
         }
+
         for(int j = 0; j< p->ghosts.size(); j++) {
 
             auto gDist = p->ghosts[j];
@@ -134,10 +132,11 @@ void Simulation::computeForces(float deltaTime) {
                 accel -= glm::normalize(gDist) * kp*spiky()*pow(hs-r2,2.0f);
             }
         }
+
         // Gravity
         accel *= particleMass;
         accel .y += G;
-        particles[i]->acceleration = accel;
+        p->acceleration = accel;
 
     }
 

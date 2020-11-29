@@ -45,12 +45,6 @@ int Grid::getCellHash(glm::vec3 cellPos) const {
 void Grid::findNeighbors(std::vector<Particle *> &particles, float rad) {
 
     #pragma omp parallel for
-    for(int p = 0; p < particles.size(); p++) {
-        particles[p]->neighbors.clear();
-        particles[p]->ghosts.clear();
-    }
-
-    #pragma omp parallel for
     for(int c = 0; c < cells.size(); c++) {
         cells[c].clear();
     }
@@ -61,10 +55,11 @@ void Grid::findNeighbors(std::vector<Particle *> &particles, float rad) {
     }
 
     #pragma omp parallel for
-
     for(int m = 0; m < particles.size(); m++) {
         auto * p = particles[m];
         glm::vec3 cellPos = getCellPos(p->position);
+        p->neighbors.clear();
+        p->ghosts.clear();
 
         for (int k = -1; k <= 1; k++) {
             for (int j = -1; j <= 1; j++) {
@@ -82,7 +77,7 @@ void Grid::findNeighbors(std::vector<Particle *> &particles, float rad) {
             }
         }
 
-        float boundaryDist = 2.0f * particleRadius;
+        float boundaryDist = 0.5f * rad;
         if(p->position.y < boundaryDist) {
             for(auto * bp: boundaryParticles) {
                 auto bpPos = bp->position;

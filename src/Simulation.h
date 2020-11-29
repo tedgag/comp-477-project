@@ -14,7 +14,7 @@ class Simulation {
         void run();
         void timeIntegration( float deltaTime);
         void computeDensityPressure();
-        void computeForces(float deltaTime);
+        void computeForces();
         float poly6();
         float spiky();
     private:
@@ -27,9 +27,9 @@ class Simulation {
         Shader * particleShader;
         std::vector<Particle *> particles;
         std::size_t nbParticles;
-        float particleRadius = 0.25f;
+        float particleRadius = 0.2f;
 
-        float particleMass = 160.0f;
+        float particleMass = 80.0f;
         float h, hs;
         const double pi = 3.14159265358979323846;
         const float G = -9.81f;
