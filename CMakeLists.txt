@@ -17,7 +17,7 @@ file(GLOB_RECURSE HEADER_FILES
         ${CMAKE_SOURCE_DIR}/lib/imgui/*.h
         )
 # Define the executable
-add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES} src/UserInterface.cpp src/UserInterface.h src/SkyRenderer.cpp src/SkyRenderer.h src/Scene.cpp src/Scene.h)
+add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
 # Configure assets header file
 configure_file(src/helpers/RootDir.h.in src/helpers/RootDir.h)
 include_directories(${CMAKE_BINARY_DIR}/src)

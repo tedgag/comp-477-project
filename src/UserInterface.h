@@ -6,12 +6,12 @@
 #define COMP477PROJECT_USERINTERFACE_H
 
 
-#include "Simulation.h"
+#include "Scene.h"
 
 class UserInterface {
 public:
     static void init(GLFWwindow *window, const char* glsl_version);
-    static void render(Simulation * simulation);
+    static void render(Scene * scene);
 private:
 };
 

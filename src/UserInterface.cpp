@@ -20,7 +20,7 @@ void UserInterface::init(GLFWwindow *window, const char* glsl_version) {
     ImGui_ImplOpenGL3_Init(glsl_version);
 }
 
-void UserInterface::render(Simulation *simulation) {
+void UserInterface::render(Scene * scene) {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -35,63 +35,58 @@ void UserInterface::render(Simulation *simulation) {
     {
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
                     ImGui::GetIO().Framerate);
-        ImGui::Text("Particles: %d (Max: %d)", simulation->nbParticles, simulation->maxParticles);
+        ImGui::Text("Particles: %d (Max: %d)", scene->nbParticles, scene->maxParticles);
 
 
-        if (simulation->start) {
-            if (simulation->play) {
+        if (scene->start) {
+            if (scene->play) {
                 if (ImGui::Button("Stop"))
-                    simulation->play = false;
+                    scene->play = false;
             } else {
                 if (ImGui::Button("Play"))
-                    simulation->play = true;
+                    scene->play = true;
             }
             ImGui::SameLine();
             if (ImGui::Button("Reset")) {
-                simulation->setFluid();
-                simulation->play = false;
-                simulation->start = false;
+                scene->setFluid();
+                scene->play = false;
+                scene->start = false;
             }
         } else {
             if (ImGui::Button("Start")) {
-                simulation->play = true;
-                simulation->start = true;
+                scene->play = true;
+                scene->start = true;
             }
         }
 
         if (ImGui::CollapsingHeader("Scene Options")) {
-            int bounds[3] = {(int)simulation->gridDimensions.x,
-                             (int)simulation->gridDimensions.y,
-                             (int)simulation->gridDimensions.z};
+            int bounds[3] = {(int)scene->gridDimensions.x,
+                             (int)scene->gridDimensions.y,
+                             (int)scene->gridDimensions.z};
             ImGui::SliderInt3("bounds", bounds, 1, 40);
-            simulation->setBoundaries(glm::vec3(bounds[0], bounds[1], bounds[2]));
+            scene->setBoundaries(glm::vec3(bounds[0], bounds[1], bounds[2]));
         }
         if (ImGui::CollapsingHeader("Fluid Options")) {
-            int dimensions[3] = {(int)simulation->fluidDimensions.x,
-                                 (int)simulation->fluidDimensions.y,
-                                 (int)simulation->fluidDimensions.z};
-            float pos[3] = {simulation->fluidPosition.x, simulation->fluidPosition.y, simulation->fluidPosition.z};
-            float col[3] = {simulation->particleColor.x, simulation->particleColor.y,simulation->particleColor.z};
+            int dimensions[3] = {(int)scene->fluidDimensions.x,
+                                 (int)scene->fluidDimensions.y,
+                                 (int)scene->fluidDimensions.z};
+            float pos[3] = {scene->fluidPosition.x, scene->fluidPosition.y, scene->fluidPosition.z};
+            float col[3] = {scene->particleColor.x, scene->particleColor.y,scene->particleColor.z};
 
             ImGui::DragFloat3("position", pos, 0.01f, 0.0f, 40.0f);
             ImGui::SliderInt3("dimensions", dimensions, 2, 40);
             ImGui::ColorEdit3("color", col);
 
 
-            simulation->setFluid(glm::vec3(pos[0], pos[1], pos[2]),glm::vec3(dimensions[0], dimensions[1], dimensions[2]));
-            simulation->particleColor = glm::vec3(col[0],col[1],col[2]);
+            scene->setFluid(glm::vec3(pos[0], pos[1], pos[2]),glm::vec3(dimensions[0], dimensions[1], dimensions[2]));
+            scene->particleColor = glm::vec3(col[0],col[1],col[2]);
         }
         if (ImGui::CollapsingHeader("Camera Controls")) {
             ImGui::Text("F: Enable/Disable Free Camera Mode");
             ImGui::Text("WASD: Move Around in Direction of Cursor");
             ImGui::Text("SHIFT (Hold): Move Slightly Faster");
         }
-
-
-
         // Buttons return true when clicked (most widgets return true when edited/activated)
-
-
     }
     ImGui::End();
 

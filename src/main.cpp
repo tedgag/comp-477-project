@@ -3,7 +3,7 @@
 
 #include "helpers/IncludeHeader.h"
 
-#include "Simulation.h"
+#include "Scene.h"
 #include "EventHandler.h"
 #include "UserInterface.h"
 
@@ -46,7 +46,7 @@ int main(){
 
     UserInterface::init(window, glsl_version);
     auto * camera = new Camera(glm::vec3(-15.0f, 10.0f, 6.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f, -15.0f);
-    auto * sim = new Simulation(camera);
+    auto * scene =  new Scene(camera);
 
     EventHandler::init(window, camera);
     // Main loop
@@ -61,8 +61,8 @@ int main(){
         lastFrame = currentFrame;
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         EventHandler::processInput(window, deltaTime);
-        sim->run();
-        UserInterface::render(sim);
+        scene->render();
+        UserInterface::render(scene);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
