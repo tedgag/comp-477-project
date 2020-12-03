@@ -11,6 +11,8 @@ private:
     static float mouseX;
     static float mouseY;
     static bool firstMouse;
+    static bool enableCursor;
+    static bool fPress;
 public:
     static Camera * camera;
     static void init(GLFWwindow* window, Camera * camera);

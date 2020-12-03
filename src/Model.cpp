@@ -14,6 +14,8 @@ Model::Model(Mesh * mesh,glm::vec3 position,glm::vec3 rotation,glm::vec3 scaling
 
 Model::Model(Mesh * mesh, glm::vec3 color) :  mesh{mesh} , color{color} {}
 
+Model::Model(Mesh * mesh) :  mesh{mesh} {}
+
 glm::mat4 Model::getModelMatrix() {
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, position);
@@ -24,11 +26,11 @@ glm::mat4 Model::getModelMatrix() {
     return model;
 }
 
-void Model::draw(Shader &shader) {
+void Model::draw(Shader &shader, GLenum mode) {
     glm::mat4 model = getModelMatrix();
     shader.setMat4("model", model);
     shader.setVec3("color", color);
-    mesh->draw(shader);
+    mesh->draw(shader, mode);
 }
 
 

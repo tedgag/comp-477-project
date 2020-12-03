@@ -5,6 +5,7 @@
 
 #include "Simulation.h"
 #include "EventHandler.h"
+#include "UserInterface.h"
 
 using namespace glm;
 
@@ -14,7 +15,7 @@ int main(){
         fprintf( stderr, "Failed to initialize GLFW\n" );
         return -1;
     }
-
+    const char* glsl_version = "#version 330";
     glfwWindowHint(GLFW_SAMPLES, 4); // 4x antialiasing
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // We want OpenGL 3.3
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -43,23 +44,25 @@ int main(){
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.0f, 0.5f, 0.5f, 1.0f);
 
-
-    auto * camera = new Camera(glm::vec3(0.0f, 6.0f, 6.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
+    UserInterface::init(window, glsl_version);
+    auto * camera = new Camera(glm::vec3(-15.0f, 10.0f, 6.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f, -15.0f);
     auto * sim = new Simulation(camera);
+
     EventHandler::init(window, camera);
     // Main loop
     float lastFrame = 0.0f;
     float deltaTime = 0.0f;
 
-    while (!glfwWindowShouldClose(window))
-    {
+
+    while (!glfwWindowShouldClose(window)) {
+
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         EventHandler::processInput(window, deltaTime);
         sim->run();
-
+        UserInterface::render(sim);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

@@ -21,6 +21,6 @@ void Renderer::render() {
     shader->use();
     camera->setShaderUniforms(shader);
     for (auto & model : models) {
-       model->draw(*shader);
+       model->draw(*shader, GL_TRIANGLES);
     }
 }

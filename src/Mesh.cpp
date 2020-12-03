@@ -10,6 +10,7 @@
 
 
 #include <assimp/Importer.hpp>      // C++ importer interface
+#include <utility>
 #include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
 
@@ -17,27 +18,38 @@ using namespace glm;
 using namespace std;
 
 Mesh::Mesh() = default;
-Mesh::Mesh(const string& modelPath) {
-    loadAssImp(modelPath);
+Mesh::Mesh(const string& modelPath, const std::vector<std::string>& cubeMapFaces, std::vector<Vertex> verts) {
+
+    if (verts.empty()) {
+        loadAssImp(modelPath);
+    } else {
+        vertices = verts;
+    }
+
+
+    if (!cubeMapFaces.empty()) {
+        loadCubeMap(cubeMapFaces);
+    }
     // create buffers/arrays
     glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-
     glBindVertexArray(VAO);
-
+    
+    glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+    
+    if (!indices.empty()) {
+        glGenBuffers(1, &EBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+    }
+    
     // vertex positions
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
     // vertex normals
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-
 }
 Mesh::~Mesh()
 {
@@ -45,9 +57,8 @@ Mesh::~Mesh()
     glDeleteVertexArrays(1, &VAO);
 }
 /* Method to load an external texture using the stb_image header file. */
+void Mesh::loadTexture(const string& path) {
 
-GLuint Mesh::loadTexture(const string& path) {
-    unsigned int texture;
     glGenTextures(1, &texture);
 
     int width, height, nrComponents;
@@ -79,14 +90,37 @@ GLuint Mesh::loadTexture(const string& path) {
         stbi_image_free(data);
     }
 
-    return texture;
 }
+void Mesh::loadCubeMap(std::vector<std::string> faces)
+{
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 
-void Mesh::draw(Shader &shader) {
+    int width, height, nrChannels;
+    for (unsigned int i = 0; i < faces.size(); i++)
+    {
+        unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+        if (data)
+        {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            stbi_image_free(data);
+        }
+        else
+        {
+            std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+            stbi_image_free(data);
+        }
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+}
+void Mesh::draw(Shader &shader, GLenum mode) {
     // draw mesh
     glBindVertexArray(VAO);
-    //glDrawArrays(GL_TRIANGLES, 0, 36);
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(mode, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
 
@@ -104,6 +138,7 @@ bool Mesh::loadAssImp(const string& path){
         getchar();
         return false;
     }
+
     const aiMesh* mesh = scene->mMeshes[0]; // In this simple example code we always use the 1rst mesh (in OBJ files there is often only one anyway)
 
     for(unsigned int i = 0; i < mesh->mNumVertices; i++)
@@ -124,7 +159,7 @@ bool Mesh::loadAssImp(const string& path){
             vertex.normal = vector;
         }
         // texture coordinates
-        /*
+
         if(mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
         {
             glm::vec2 vec;
@@ -137,8 +172,6 @@ bool Mesh::loadAssImp(const string& path){
         else
             vertex.texCoords = glm::vec2(0.0f, 0.0f);
 
-
-         */
         vertices.push_back(vertex);
     }
 

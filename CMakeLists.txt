@@ -6,17 +6,18 @@ set(CMAKE_CXX_STANDARD 17)
 file(GLOB_RECURSE SOURCE_FILES
         ${CMAKE_SOURCE_DIR}/src/*.c
         ${CMAKE_SOURCE_DIR}/src/*.cpp
+        ${CMAKE_SOURCE_DIR}/lib/imgui/*.cpp
         )
 
 # Add header files
 file(GLOB_RECURSE HEADER_FILES
         ${CMAKE_SOURCE_DIR}/src/*.h
         ${CMAKE_SOURCE_DIR}/src/*.hpp
-        ${CMAKE_SOURCE_DIR}/lib/stb/stb_image.h
+        ${CMAKE_SOURCE_DIR}/lib/stb/*.h
+        ${CMAKE_SOURCE_DIR}/lib/imgui/*.h
         )
 # Define the executable
-add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
-
+add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES} src/UserInterface.cpp src/UserInterface.h src/SkyRenderer.cpp src/SkyRenderer.h src/Scene.cpp src/Scene.h)
 # Configure assets header file
 configure_file(src/helpers/RootDir.h.in src/helpers/RootDir.h)
 include_directories(${CMAKE_BINARY_DIR}/src)
@@ -40,4 +41,6 @@ target_link_libraries(comp477project PRIVATE glm)
 add_subdirectory(lib/assimp EXCLUDE_FROM_ALL)
 target_link_libraries(comp477project PRIVATE assimp)
 # stb
-include_directories(lib/stb)
+target_include_directories(comp477project PRIVATE lib/stb)
+# imgui
+target_include_directories(comp477project PRIVATE lib/imgui)

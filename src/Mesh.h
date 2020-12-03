@@ -15,6 +15,7 @@
 struct Vertex {
     glm::vec3 position;
     glm::vec3 normal;
+    glm::vec2 texCoords;
 };
 
 
@@ -24,13 +25,20 @@ class Mesh {
         std::vector<Vertex> vertices;
 
         std::vector<unsigned int> indices;
-        GLuint VAO,VBO,EBO = 0;
+        GLuint VAO = 0;
+        GLuint VBO = 0;
+        GLuint EBO = 0;
+        GLuint texture = 0;
         Mesh();
-        Mesh(const std::string& modelPath);
+        Mesh(const std::string& modelPath,
+             const std::vector<std::string>& cubeMapFaces = std::vector<std::string>(),
+                     std::vector<Vertex> vertices = std::vector<Vertex>());
         ~Mesh();
-        void draw(Shader &shader);
+        void draw(Shader &shader, GLenum mode);
     private:
-        GLuint loadTexture(const std::string& path);
+        void loadTexture(const std::string& path);
+        void loadCubeMap(std::vector<std::string> faces);
+
         bool loadAssImp(const std::string& path);
 };
 

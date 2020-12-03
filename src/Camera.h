@@ -32,6 +32,7 @@ public:
     void processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
     void processMouseScroll(float yoffset);
     void setShaderUniforms(Shader * shader);
+    void setShaderUniformsStatic(Shader * shader);
 private:
     void updateCameraVectors();
 };

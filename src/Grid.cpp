@@ -6,39 +6,39 @@
 #include <iostream>
 #include <random>
 
-Grid::Grid(glm::vec3 dimensions, float cellSize, float particleRadius) {
-    this->dimensions = dimensions;
+Grid::Grid(float cellSize, float particleRadius) {
     this->cellSize = cellSize;
     this->particleRadius = particleRadius;
-    cellCount = dimensions.x/cellSize * dimensions.y/cellSize * dimensions.z/cellSize;
-    cells.resize(cellCount);
     generateBoundaryParticles();
 }
-glm::vec3 Grid::getCellPos(glm::vec3 pos) const{
-    if (pos.x == dimensions.x) {
+glm::vec3 Grid::getCellPos(glm::vec3 pos){
+    if (pos.x == boundaries.x) {
         pos.x -= 0.01f;
     }
-    if (pos.y == dimensions.y) {
+    if (pos.y == boundaries.y) {
         pos.y -= 0.01f;
     }
-    if (pos.z == dimensions.z) {
+    if (pos.z == boundaries.z) {
         pos.z -= 0.01f;
     }
+
     return glm::floor(pos/cellSize);
 }
 
-int Grid::getCellHash(glm::vec3 cellPos) const {
+int Grid::getCellHash(glm::vec3 cellPos) {
 
-    if((cellPos.x < 0)||(cellPos.x >= dimensions.x/cellSize)||
-        (cellPos.y < 0)||(cellPos.y >= dimensions.y/cellSize)||
-        (cellPos.z < 0)||(cellPos.z >= dimensions.z/cellSize)) {
+    if((cellPos.x < 0)||(cellPos.x >= dimensions.x)||
+        (cellPos.y < 0)||(cellPos.y >= dimensions.y)||
+        (cellPos.z < 0)||(cellPos.z >= dimensions.z)) {
         return -1;
     }
 
-    int hash = (int) (cellPos.x + dimensions.x/cellSize * (cellPos.y + dimensions.y/cellSize * cellPos.z));
+    int hash = (int) (cellPos.x + dimensions.x * (cellPos.y + dimensions.y * cellPos.z));
     if (hash >= cellCount) {
+        std::cout << to_string(boundaries/cellSize) << std::endl;
         std::cout << to_string(cellPos) << std::endl;
-        std::cout << hash << std::endl;
+        //std::cout << hash << std::endl;
+        //std::cout << cellCount << std::endl;
     }
     return hash;
 }
@@ -50,7 +50,6 @@ void Grid::findNeighbors(std::vector<Particle *> &particles, float rad) {
     }
 
     for (int p = 0; p < particles.size(); p++) {
-
         cells[getCellHash(getCellPos(particles[p]->position))].push_back(p);
     }
 
@@ -64,6 +63,7 @@ void Grid::findNeighbors(std::vector<Particle *> &particles, float rad) {
         for (int k = -1; k <= 1; k++) {
             for (int j = -1; j <= 1; j++) {
                 for (int i = -1; i <= 1; i++) {
+
                     int hash = getCellHash(cellPos + glm::vec3((float) i, (float) j, (float) k));
                     if (hash != -1) {
                         for (auto & n : cells[hash]) {
@@ -90,7 +90,7 @@ void Grid::findNeighbors(std::vector<Particle *> &particles, float rad) {
 
             }
         }
-        if(p->position.x < boundaryDist || p->position.x > (dimensions.x-boundaryDist)) {
+        if(p->position.x < boundaryDist || p->position.x > (boundaries.x-boundaryDist)) {
             for(auto * bp: boundaryParticles) {
                 auto bpPos = bp->position;
                 auto gPos = p->position[0] < boundaryDist ?
@@ -103,7 +103,7 @@ void Grid::findNeighbors(std::vector<Particle *> &particles, float rad) {
                 }
             }
         }
-        if(p->position[2] < boundaryDist || p->position[2] > (dimensions.z-boundaryDist)) {
+        if(p->position[2] < boundaryDist || p->position[2] > (boundaries.z-boundaryDist)) {
             for(auto * bp: boundaryParticles) {
                 auto bpPos = bp->position;
                 auto gPos = p->position[2] < boundaryDist ?
@@ -122,9 +122,9 @@ void Grid::findNeighbors(std::vector<Particle *> &particles, float rad) {
 
 std::vector<glm::vec3> Grid::getCellInstances() {
     std::vector<glm::vec3> cells;
-    for (int i = 0; i < (int)(dimensions.x/cellSize); i++) {
-        for (int j = 0; j < (int)(dimensions.y/cellSize); j++) {
-            for (int k = 0; k < (int)(dimensions.z/cellSize); k++) {
+    for (int i = 0; i < (int)(boundaries.x/cellSize); i++) {
+        for (int j = 0; j < (int)(boundaries.y/cellSize); j++) {
+            for (int k = 0; k < (int)(boundaries.z/cellSize); k++) {
                 cells.push_back(glm::vec3(i,j,k)*cellSize + cellSize/2);
             }
         }
@@ -140,15 +140,15 @@ void Grid::collisionHandling(std::vector<Particle *> &particles) {
                 p->velocity[j] *= boundDamping;
                 p->position[j] += - p->position[j] * 1.5;
             }
-            if (p->position[j] >= dimensions[j] ) {
+            if (p->position[j] >= boundaries[j] ) {
                 p->velocity[j] *= boundDamping;
-                p->position[j] -= (p->position[j] - dimensions[j]) * 1.5;
+                p->position[j] -= (p->position[j] - boundaries[j]) * 1.5;
             }
         }
     }
 }
 void Grid::generateBoundaryParticles() {
-    int N = 7;
+    int N = 13;
     float spacing = 3.0f*cellSize/(float)N;
     glm::vec2 corner = glm::vec2(-cellSize + spacing*0.5f - cellSize/2);
 
@@ -162,7 +162,14 @@ void Grid::generateBoundaryParticles() {
             auto * p = new Particle();
             p->position = glm::vec3 (pos2D[0] + distr(gen)*0.2f,pos2D[1] + distr(gen)*0.2f, distr(gen) * 0.1f);
             boundaryParticles.push_back(p);
-            std::cout << to_string(p->position) << std::endl;
         }
     }
+}
+
+void Grid::updateBoundaries(glm::vec3 newBoundaries, glm::vec3 newDimensions) {
+
+    this->boundaries = newBoundaries;
+    this->dimensions = newDimensions;
+    cellCount = dimensions.x * dimensions.y * dimensions.z;
+    cells.resize(cellCount + 1);
 }

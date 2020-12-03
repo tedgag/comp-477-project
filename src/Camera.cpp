@@ -20,8 +20,16 @@ void Camera::setShaderUniforms(Shader * shader) {
     proj = glm::perspective(zoomFactor, (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.01f, 1000.0f);
     shader->setMat4("proj", proj);
     shader->setVec3("viewPos", position);
-
-
+}
+void Camera::setShaderUniformsStatic(Shader * shader) {
+    shader->use();
+    glm::mat4 viewMatrix = glm::mat4(1.0f);
+    viewMatrix = glm::lookAt(position, position + front,up);
+    shader->setMat4("view", glm::mat3(viewMatrix));
+    glm::mat4 proj = glm::mat4(1.0f);
+    proj = glm::perspective(zoomFactor, (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.01f, 1000.0f);
+    shader->setMat4("proj", proj);
+    shader->setVec3("viewPos", position);
 }
 
 void Camera::updateCameraVectors() {
