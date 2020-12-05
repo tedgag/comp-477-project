@@ -26,7 +26,7 @@ void Simulation::run() {\
 void Simulation::computeDensityPressure() {
     #pragma omp parallel for
     for (int i =0 ; i<particles.size(); i++) {
-        Particle * p = particles[i];
+        std::shared_ptr<Particle> p = particles[i];
         p->density = poly6()*pow(hs, 3.0f);
         for(int j =0 ; j<p->neighbors.size(); j++)
         {
@@ -57,11 +57,11 @@ void Simulation::computeForces() {
     for (int i =0 ; i<particles.size(); i++) {
         glm::vec3 accel = glm::vec3(0.0f,0.0f,0.0f);
 
-        Particle * p = particles[i];
+        std::shared_ptr<Particle> p = particles[i];
         float kp = p->pressure / (p->density * p->density);
         // Regular neighbors
         for (int j =0 ; j<p->neighbors.size(); j++) {
-            Particle * n = p->neighbors[j];
+            std::shared_ptr<Particle> n = p->neighbors[j];
             float r = glm::length(p->position - n->position);
             float r2 = r * r;
             if (r2 <= hs && r2 > 0) {
@@ -97,7 +97,7 @@ void Simulation::computeForces() {
 void Simulation::timeIntegration( float deltaTime) {
     #pragma omp parallel for
     for (int i =0 ; i<particles.size(); i++) {
-        auto * p = particles[i];
+        auto p = particles[i];
         p->velocity += p->acceleration * deltaTime;
         p->position += p->velocity * deltaTime;
     }

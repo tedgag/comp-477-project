@@ -6,22 +6,22 @@
 
 #include <utility>
 #include "glm/gtc/matrix_transform.hpp"
-
+#include <iostream>
 
 using namespace glm;
 using namespace std;
 
-Renderer::Renderer(Camera* camera) {
+Renderer::Renderer(std::shared_ptr<Camera> camera) {
     this->camera = camera;
-    sceneShader = new Shader(
+    sceneShader = std::make_shared<Shader>(
             "../resources/shaders/scene_shader.vert",
             "../resources/shaders/scene_shader.frag"
     );
-    particleShader = new Shader(
+    particleShader = std::make_shared<Shader>(
             "../resources/shaders/particles_shader.vert",
             "../resources/shaders/particles_shader.frag"
     );
-    skyShader = new Shader(
+    skyShader = std::make_shared<Shader>(
             "../resources/shaders/sky_shader.vert",
             "../resources/shaders/sky_shader.frag"
     );
@@ -33,18 +33,14 @@ Renderer::Renderer(Camera* camera) {
             "../resources/assets/textures/skybox/lake/pz.png",
             "../resources/assets/textures/skybox/lake/nz.png",
     };
-
-    Mesh * particleMesh = new Mesh("../resources/assets/models/sphere.obj");
-    Mesh * boxMesh = new Mesh("../resources/assets/models/box.obj");
-
-    boxModel = new Model(
-            boxMesh,
+    boxModel = std::make_shared<Model>(
+            std::make_shared<Mesh>("../resources/assets/models/box.obj"),
             glm::vec3(0.0f),
             glm::vec3(0.0f),
             glm::vec3(0.0f),
             glm::vec3(0.5f,0.5f,0.5f));
 
-    particleModel = new Model(particleMesh);
+    particleModel = std::make_shared<Model>(std::make_shared<Mesh>("../resources/assets/models/sphere.obj"));
     sceneModels.push_back(boxModel);
     setupSkybox(faces);
     particlesBuffer = setupInstancedBuffer(particleModel);
@@ -87,7 +83,7 @@ void Renderer::render(std::vector<glm::vec3> positions, glm::vec3 particleColor,
     }
 }
 
-GLuint Renderer::setupInstancedBuffer(Model *model) {
+GLuint Renderer::setupInstancedBuffer(std::shared_ptr<Model>model) {
     GLuint buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
@@ -147,7 +143,11 @@ void Renderer::setupSkybox(std::vector<std::string> faces) {
             {glm::vec3(-1.0f, -1.0f, 1.0f)},
             {glm::vec3(1.0f, -1.0f, 1.0f)},
     };
-    Mesh * skyMesh = new Mesh("../resources/assets/models/cube.obj",faces,std::vector<Vertex>(skyboxVertices, skyboxVertices + sizeof skyboxVertices / sizeof skyboxVertices[0]));
-    skyBoxModel = new Model (skyMesh);
+    skyBoxModel = std::make_shared<Model>(
+            std::make_shared<Mesh>(
+            "../resources/assets/models/cube.obj",
+            faces,
+            std::vector<Vertex>(skyboxVertices, skyboxVertices + sizeof skyboxVertices / sizeof skyboxVertices[0])
+            ));
 }
 

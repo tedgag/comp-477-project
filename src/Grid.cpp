@@ -4,6 +4,7 @@
 
 #include "Grid.h"
 #include <iostream>
+#include <memory>
 #include <random>
 
 Grid::Grid(float cellSize, float particleRadius) {
@@ -42,7 +43,7 @@ int Grid::getCellHash(glm::vec3 cellPos) {
     }
     return hash;
 }
-void Grid::findNeighbors(std::vector<Particle *> &particles, float rad) {
+void Grid::findNeighbors(std::vector<std::shared_ptr<Particle>> &particles, float rad) {
 
     #pragma omp parallel for
     for(int c = 0; c < cells.size(); c++) {
@@ -55,7 +56,7 @@ void Grid::findNeighbors(std::vector<Particle *> &particles, float rad) {
 
     #pragma omp parallel for
     for(int m = 0; m < particles.size(); m++) {
-        auto * p = particles[m];
+        auto p = particles[m];
         glm::vec3 cellPos = getCellPos(p->position);
         p->neighbors.clear();
         p->ghosts.clear();
@@ -67,7 +68,7 @@ void Grid::findNeighbors(std::vector<Particle *> &particles, float rad) {
                     int hash = getCellHash(cellPos + glm::vec3((float) i, (float) j, (float) k));
                     if (hash != -1) {
                         for (auto & n : cells[hash]) {
-                            auto * neighbor = particles[n];
+                            auto neighbor = particles[n];
                             float dist = glm::distance(p->position, neighbor->position);
                             if (dist <= rad && m != n)
                                 p->neighbors.push_back(neighbor);
@@ -81,7 +82,7 @@ void Grid::findNeighbors(std::vector<Particle *> &particles, float rad) {
         float boundaryDist = 0.5f * rad;
         for (int i = 0 ; i< 3; i++) {
             if(p->position[i]< boundaryDist || p->position[i] > (boundaries[i]-boundaryDist)) {
-                for(auto * bp: boundaryParticles) {
+                for(auto bp: boundaryParticles) {
                     auto bpPos = bp->position;
                     glm::vec3 gPos;
                     switch (i) {
@@ -122,10 +123,10 @@ std::vector<glm::vec3> Grid::getCellInstances() {
     }
     return cells;
 }
-void Grid::collisionHandling(std::vector<Particle *> &particles) {
+void Grid::collisionHandling(std::vector<std::shared_ptr<Particle>> &particles) {
     #pragma omp parallel for
     for (int i =0 ; i<particles.size(); i++) {
-        auto * p = particles[i];
+        auto p = particles[i];
         for (int j=0; j< 3 ; j++) {
             if (p->position[j] < 0.0f) {
                 p->velocity[j] *= boundDamping;
@@ -146,7 +147,7 @@ void Grid::generateBoundaryParticles() {
     for(int i = 0; i < side; ++i) {
         for(int j = 0; j < side; ++j) {
             glm::vec2 pos = corner + glm::vec2(i, j) * spacing;
-            auto * p = new Particle();
+            std::shared_ptr<Particle> p = std::make_shared<Particle>();
             p->position = glm::vec3 (pos, 0.0f);
             boundaryParticles.push_back(p);
         }

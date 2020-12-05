@@ -8,7 +8,7 @@
 
 #include <string>
 #include <vector>
-
+#include <memory>
 #include "Shader.h"
 
 class Camera {
@@ -31,8 +31,8 @@ public:
     void processKeyboard(std::string, float deltaTime);
     void processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
     void processMouseScroll(float yoffset);
-    void setShaderUniforms(Shader * shader);
-    void setShaderUniformsStatic(Shader * shader);
+    void setShaderUniforms(std::shared_ptr<Shader> shader);
+    void setShaderUniformsStatic(std::shared_ptr<Shader> shader);
 private:
     void updateCameraVectors();
 };

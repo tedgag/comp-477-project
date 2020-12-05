@@ -24,8 +24,6 @@ void main()
     vec3 diffuse = vec3(0.4f, 0.4f, 0.4f) * diff;
     vec3 specular = vec3(0.5f, 0.5f, 0.5f) * spec;
     vec3 lighting = (ambient + diffuse + specular) * color;
-    // calculate shadow
-    // float shadow = ShadowCalculation(fragPosLightSpace);
-    // vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;
+
     fColor = vec4(lighting, 1.0f);
 }

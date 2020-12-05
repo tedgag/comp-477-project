@@ -8,10 +8,10 @@ float EventHandler::mouseY =  SCR_HEIGHT / 2.0;
 bool EventHandler::firstMouse = true;
 bool EventHandler::enableCursor = true;
 bool EventHandler::fPress = false;
-Camera * EventHandler::camera = nullptr;
+std::shared_ptr<Camera> EventHandler::camera = nullptr;
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-void EventHandler::init(GLFWwindow * window, Camera * cam) {
+void EventHandler::init(GLFWwindow * window, std::shared_ptr<Camera> cam) {
     camera = cam;
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetCursorPosCallback(window, mouse_callback);

@@ -1,6 +1,8 @@
 
 #include <stdio.h>
 
+#include <memory>
+
 #include "helpers/IncludeHeader.h"
 
 #include "Scene.h"
@@ -45,9 +47,13 @@ int main(){
     glClearColor(0.0f, 0.5f, 0.5f, 1.0f);
 
 
-    auto * camera = new Camera(glm::vec3(-15.0f, 10.0f, 6.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f, -15.0f);
-    auto * scene =  new Scene(camera);
-    UserInterface::init(window, glsl_version, scene);
+    std::shared_ptr<Camera> camera = std::make_shared<Camera>(
+            glm::vec3(-15.0f, 10.0f, 6.0f),
+            glm::vec3(0.0f, 1.0f, 0.0f),
+            0.0f,
+            -15.0f);
+    std::shared_ptr<Scene> scene =  std::make_shared<Scene>(camera);
+    UserInterface::init(window, glsl_version);
     EventHandler::init(window, camera);
     // Main loop
     float lastFrame = 0.0f;
@@ -62,7 +68,7 @@ int main(){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         EventHandler::processInput(window, deltaTime);
         scene->render();
-        UserInterface::render();
+        UserInterface::render(scene);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

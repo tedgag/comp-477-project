@@ -7,14 +7,10 @@
 
 
 #include "Scene.h"
-
 class UserInterface {
 public:
-    static void init(GLFWwindow *window, const char* glsl_version, Scene * scene);
-    static void render();
-private:
-    static Scene * currentScene;
-    static Scene * savedScene;
+    static void init(GLFWwindow *window, const char* glsl_version);
+    static void render(std::shared_ptr<Scene>scene);
 };
 
 

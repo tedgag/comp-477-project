@@ -7,25 +7,24 @@
 
 #include "Model.h"
 #include "Camera.h"
-
+#include <memory>
 class Renderer {
     public:
-        Renderer(Camera* camera);
+        Renderer(std::shared_ptr<Camera> camera);
         void render(std::vector<glm::vec3> positions, glm::vec3 particleColor, float particleRadius);
-        Model * boxModel;
+        std::shared_ptr<Model> boxModel;
     private:
-        GLuint setupInstancedBuffer(Model * model);
+        GLuint setupInstancedBuffer(std::shared_ptr<Model> model);
         void setupSkybox( std::vector<std::string> faces);
-        Shader* shader;
-        Camera* camera;
-        std::vector<Model*> models;
+        std::shared_ptr<Camera> camera;
+        std::vector<std::shared_ptr<Model>> models;
         GLuint particlesBuffer;
-        Model * particleModel;
-        Model * skyBoxModel;
-        std::vector<Model *> sceneModels;
-        Shader * sceneShader;
-        Shader * particleShader;
-        Shader * skyShader;
+        std::shared_ptr<Model> particleModel;
+        std::shared_ptr<Model> skyBoxModel;
+        std::vector<std::shared_ptr<Model>> sceneModels;
+        std::shared_ptr<Shader> sceneShader;
+        std::shared_ptr<Shader> particleShader;
+        std::shared_ptr<Shader> skyShader;
 };
 
 

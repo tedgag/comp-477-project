@@ -9,7 +9,7 @@ class Simulation {
     public:
         Simulation(float particleRadius);
         void run();
-        std::vector<Particle *> particles;
+        std::vector<std::shared_ptr<Particle>> particles;
 
         Grid * grid;
         float particleMass = 80.0f;
