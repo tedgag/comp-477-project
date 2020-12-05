@@ -8,19 +8,24 @@
 
 Simulation::Simulation(float particleRadius) {
     this->particleRadius = particleRadius;
-    h = 4*particleRadius;
+    h = 3*particleRadius;
     hs = h * h;
     grid = new Grid( h, particleRadius);
 }
 
-void Simulation::run() {\
+void Simulation::run(float deltaTime) {
 
     grid->collisionHandling(particles);
     grid->findNeighbors(particles, h);
     computeDensityPressure();
-    float deltaTime = 0.05f * particleRadius;
+    float step;
+    if (deltaTime < 0.05f) {
+        step = 2.0f * deltaTime * particleRadius;
+    } else {
+        step = 0.1f * particleRadius;
+    }
     computeForces();
-    timeIntegration(deltaTime);
+    timeIntegration(step);
 
 }
 void Simulation::computeDensityPressure() {

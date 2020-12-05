@@ -10,12 +10,12 @@ Scene::Scene(Camera *camera) {
     this->camera = camera;
     this->renderer = new Renderer(camera);
     setBoundaries(glm::vec3(16.0f));
-    setFluid( boundaries/2.0f, glm::vec3(15));
+    setFluid( boundaries/2.0f, glm::vec3(20));
 }
 
-void Scene::render() {
+void Scene::render(float deltaTime) {
     if (play && start)
-        simulation->run();
+        simulation->run(deltaTime);
     std::vector<glm::vec3> positions;
     for (int i = 0; i < simulation->particles.size(); i++) {
         Particle *p = simulation->particles[i];

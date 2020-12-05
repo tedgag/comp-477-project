@@ -8,11 +8,11 @@
 class Simulation {
     public:
         Simulation(float particleRadius);
-        void run();
+        void run(float deltaTime);
         std::vector<Particle *> particles;
 
         Grid * grid;
-        float particleMass = 80.0f;
+        float particleMass = 100.0f;
         float h, hs;
         float particleRadius;
         glm::vec3 gravity = glm::vec3(0.0f, -9.81f, 0.0f);

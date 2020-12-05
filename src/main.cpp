@@ -1,5 +1,6 @@
 
 #include <stdio.h>
+#include <iostream>
 
 #include "helpers/IncludeHeader.h"
 
@@ -61,7 +62,7 @@ int main(){
         lastFrame = currentFrame;
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         EventHandler::processInput(window, deltaTime);
-        scene->render();
+        scene->render(deltaTime);
         UserInterface::render();
         glfwSwapBuffers(window);
         glfwPollEvents();
