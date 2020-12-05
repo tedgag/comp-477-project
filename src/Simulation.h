@@ -15,10 +15,10 @@ class Simulation {
         float particleMass = 80.0f;
         float h, hs;
         float particleRadius;
-        const float viscosity =10.0f;
+        glm::vec3 gravity = glm::vec3(0.0f, -9.81f, 0.0f);
+        float viscosity =10.0f;
     private:
         const double pi = 3.14159265358979323846;
-        const float G = -9.81f;
         const float restDensity = 1000.0f;
         void timeIntegration( float deltaTime);
         void computeDensityPressure();

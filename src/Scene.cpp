@@ -9,8 +9,8 @@ Scene::Scene(Camera *camera) {
     this->simulation = new Simulation(particleRadius);
     this->camera = camera;
     this->renderer = new Renderer(camera);
-    setBoundaries(glm::vec3(20.0f));
-    setFluid( gridBoundaries/2.0f, glm::vec3(20));
+    setBoundaries(glm::vec3(16.0f));
+    setFluid( boundaries/2.0f, glm::vec3(15));
 }
 
 void Scene::render() {
@@ -24,22 +24,23 @@ void Scene::render() {
     renderer->render(positions,particleColor,particleRadius);
 }
 
-void Scene::setBoundaries(glm::vec3 newDimensions) {
-    if (gridDimensions == newDimensions) {
+void Scene::setBoundaries(glm::vec3 newBoundaries) {
+    if (boundaries == newBoundaries) {
         return;
     }
 
-    glm::vec3 newBoundaries = newDimensions * simulation->h;
     for (int i=0; i<3; i++) {
         if (newBoundaries[i] < fluidDimensions[i] * particleRadius + fluidPosition[i] - particleRadius * 2.0f)
             return;
     }
 
-    gridDimensions = newDimensions;
-    gridBoundaries = newBoundaries;
-    renderer->boxModel->position = gridBoundaries/2.0f;
-    renderer->boxModel->scaling = gridBoundaries/2.0f;
-    simulation->grid->updateBoundaries(gridBoundaries, gridDimensions);
+    boundaries = newBoundaries;
+    if (!start) {
+        initalBoundaries = boundaries;
+    }
+    renderer->boxModel->position = boundaries/2.0f;
+    renderer->boxModel->scaling = boundaries/2.0f;
+    simulation->grid->resizeGrid(boundaries);
 }
 void Scene::setFluid(glm::vec3 newPosition, glm::vec3 newDimensions) {
     if (newPosition == fluidPosition && newDimensions == fluidDimensions)
@@ -49,7 +50,7 @@ void Scene::setFluid(glm::vec3 newPosition, glm::vec3 newDimensions) {
         return;
 
     for (int i=0; i<3; i++) {
-        if (newDimensions[i] * particleRadius + newPosition[i] - particleRadius * 2.0f> gridBoundaries[i] ||
+        if (newDimensions[i] * particleRadius + newPosition[i] - particleRadius * 2.0f> boundaries[i] ||
             newPosition[i] - newDimensions[i] * particleRadius < 0.0f ) {
             return;
         }
@@ -71,5 +72,12 @@ void Scene::setFluid() {
             }
         }
     }
+}
+void Scene::setGravity(glm::vec3 gravity) {
+    simulation->gravity = gravity;
+}
+
+void Scene::setViscosity(float viscosity) {
+    simulation->viscosity = viscosity;
 }
 

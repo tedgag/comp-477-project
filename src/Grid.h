@@ -25,7 +25,7 @@ public:
     void findNeighbors(std::vector<Particle *> &particles, float rad);
     std::vector<glm::vec3> getCellInstances();
     void collisionHandling(std::vector<Particle *> &particles);
-    void updateBoundaries(glm::vec3 boundaries, glm::vec3 dimensions);
+    void resizeGrid(glm::vec3 boundaries);
 
 };
 

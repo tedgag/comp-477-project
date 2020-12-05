@@ -8,8 +8,10 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_internal.h>
 #include <imgui_impl_opengl3.h>
-
-void UserInterface::init(GLFWwindow *window, const char* glsl_version) {
+Scene * UserInterface::currentScene;
+Scene * UserInterface::savedScene;
+static Scene * savedScene;
+void UserInterface::init(GLFWwindow *window, const char* glsl_version, Scene * scene) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -18,16 +20,15 @@ void UserInterface::init(GLFWwindow *window, const char* glsl_version) {
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
+    currentScene = scene;
 }
 
-void UserInterface::render(Scene * scene) {
+void UserInterface::render() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
     bool show_demo_window = true;
-    ImGui::ShowDemoWindow(&show_demo_window);
-
-
+    //ImGui::ShowDemoWindow(&show_demo_window);
 
     //ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
     ImGui::SetNextWindowSize(ImVec2(400, 680), 0);
@@ -35,51 +36,57 @@ void UserInterface::render(Scene * scene) {
     {
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
                     ImGui::GetIO().Framerate);
-        ImGui::Text("Particles: %d (Max: %d)", scene->nbParticles, scene->maxParticles);
+        ImGui::Text("Particles: %d (Max: %d)", currentScene->nbParticles, currentScene->maxParticles);
 
 
-        if (scene->start) {
-            if (scene->play) {
+        if (currentScene->start) {
+            if (currentScene->play) {
                 if (ImGui::Button("Stop"))
-                    scene->play = false;
+                    currentScene->play = false;
             } else {
                 if (ImGui::Button("Play"))
-                    scene->play = true;
+                    currentScene->play = true;
             }
             ImGui::SameLine();
             if (ImGui::Button("Reset")) {
-                scene->setFluid();
-                scene->play = false;
-                scene->start = false;
+                currentScene->setFluid();
+                currentScene->play = false;
+                currentScene->start = false;
+                currentScene->setBoundaries(currentScene->initalBoundaries);
             }
         } else {
             if (ImGui::Button("Start")) {
-                scene->play = true;
-                scene->start = true;
+                currentScene->play = true;
+                currentScene->start = true;
             }
         }
 
-        if (ImGui::CollapsingHeader("Scene Options")) {
-            int bounds[3] = {(int)scene->gridDimensions.x,
-                             (int)scene->gridDimensions.y,
-                             (int)scene->gridDimensions.z};
-            ImGui::SliderInt3("bounds", bounds, 1, 40);
-            scene->setBoundaries(glm::vec3(bounds[0], bounds[1], bounds[2]));
+        if (ImGui::CollapsingHeader("currentScene Options")) {
+            float bounds[3] = {currentScene->boundaries.x,
+                             currentScene->boundaries.y,
+                             currentScene->boundaries.z};
+            ImGui::DragFloat3("bounds", bounds,0.02f, 1.0f, 40.0f);
+            currentScene->setBoundaries(glm::vec3(bounds[0], bounds[1], bounds[2]));
+            float gravity[3] = {currentScene->boundaries.x,
+                               currentScene->boundaries.y,
+                               currentScene->boundaries.z};
+            ImGui::DragFloat3("gravity", gravity,0.02f, -20.0f, 20.0f);
+
         }
         if (ImGui::CollapsingHeader("Fluid Options")) {
-            int dimensions[3] = {(int)scene->fluidDimensions.x,
-                                 (int)scene->fluidDimensions.y,
-                                 (int)scene->fluidDimensions.z};
-            float pos[3] = {scene->fluidPosition.x, scene->fluidPosition.y, scene->fluidPosition.z};
-            float col[3] = {scene->particleColor.x, scene->particleColor.y,scene->particleColor.z};
+            int dimensions[3] = {(int)currentScene->fluidDimensions.x,
+                                 (int)currentScene->fluidDimensions.y,
+                                 (int)currentScene->fluidDimensions.z};
+            float pos[3] = {currentScene->fluidPosition.x, currentScene->fluidPosition.y, currentScene->fluidPosition.z};
+            float col[3] = {currentScene->particleColor.x, currentScene->particleColor.y,currentScene->particleColor.z};
 
             ImGui::DragFloat3("position", pos, 0.01f, 0.0f, 40.0f);
             ImGui::SliderInt3("dimensions", dimensions, 2, 40);
             ImGui::ColorEdit3("color", col);
 
 
-            scene->setFluid(glm::vec3(pos[0], pos[1], pos[2]),glm::vec3(dimensions[0], dimensions[1], dimensions[2]));
-            scene->particleColor = glm::vec3(col[0],col[1],col[2]);
+            currentScene->setFluid(glm::vec3(pos[0], pos[1], pos[2]),glm::vec3(dimensions[0], dimensions[1], dimensions[2]));
+            currentScene->particleColor = glm::vec3(col[0],col[1],col[2]);
         }
         if (ImGui::CollapsingHeader("Camera Controls")) {
             ImGui::Text("F: Enable/Disable Free Camera Mode");

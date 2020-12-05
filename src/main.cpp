@@ -44,10 +44,10 @@ int main(){
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.0f, 0.5f, 0.5f, 1.0f);
 
-    UserInterface::init(window, glsl_version);
+
     auto * camera = new Camera(glm::vec3(-15.0f, 10.0f, 6.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f, -15.0f);
     auto * scene =  new Scene(camera);
-
+    UserInterface::init(window, glsl_version, scene);
     EventHandler::init(window, camera);
     // Main loop
     float lastFrame = 0.0f;
@@ -62,7 +62,7 @@ int main(){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         EventHandler::processInput(window, deltaTime);
         scene->render();
-        UserInterface::render(scene);
+        UserInterface::render();
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
