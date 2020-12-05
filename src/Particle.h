@@ -6,12 +6,13 @@
 #define COMP477PROJECT_PARTICLE_H
 #include "helpers/IncludeHeader.h"
 #include <vector>
+#include <memory>
 #endif //COMP477PROJECT_PARTICLE_H
 struct Particle {
     glm::vec3 position = glm::vec3(0.0f);
     glm::vec3 velocity = glm::vec3(0.0f);
     glm::vec3 acceleration = glm::vec3(0.0f);
-    std::vector<Particle *> neighbors;
+    std::vector<std::shared_ptr<Particle>> neighbors;
     std::vector<glm::vec3> ghosts;
     float pressure;
     float density;

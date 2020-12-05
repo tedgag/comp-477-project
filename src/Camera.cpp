@@ -11,7 +11,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) {
     updateCameraVectors();
 }
 
-void Camera::setShaderUniforms(Shader * shader) {
+void Camera::setShaderUniforms(std::shared_ptr<Shader> shader) {
     shader->use();
     glm::mat4 viewMatrix = glm::mat4(1.0f);
     viewMatrix = glm::lookAt(position, position + front,up);
@@ -21,7 +21,7 @@ void Camera::setShaderUniforms(Shader * shader) {
     shader->setMat4("proj", proj);
     shader->setVec3("viewPos", position);
 }
-void Camera::setShaderUniformsStatic(Shader * shader) {
+void Camera::setShaderUniformsStatic(std::shared_ptr<Shader> shader) {
     shader->use();
     glm::mat4 viewMatrix = glm::mat4(1.0f);
     viewMatrix = glm::lookAt(position, position + front,up);

@@ -3,18 +3,19 @@
 //
 
 #include <iostream>
+#include <utility>
 #include "Model.h"
 #include "glm/gtc/matrix_transform.hpp"
 
 using namespace glm;
 using namespace std;
 
-Model::Model(Mesh * mesh,glm::vec3 position,glm::vec3 rotation,glm::vec3 scaling,glm::vec3 color) :
+Model::Model(std::shared_ptr<Mesh> mesh,glm::vec3 position,glm::vec3 rotation,glm::vec3 scaling,glm::vec3 color) :
              mesh{mesh}, position{position},rotation{rotation}, scaling{scaling}, color{color} {}
 
-Model::Model(Mesh * mesh, glm::vec3 color) :  mesh{mesh} , color{color} {}
+Model::Model(std::shared_ptr<Mesh> mesh, glm::vec3 color) :  mesh{mesh} , color{color} {}
 
-Model::Model(Mesh * mesh) :  mesh{mesh} {}
+Model::Model(std::shared_ptr<Mesh> mesh) :  mesh{mesh} {}
 
 glm::mat4 Model::getModelMatrix() {
     glm::mat4 model = glm::mat4(1.0f);

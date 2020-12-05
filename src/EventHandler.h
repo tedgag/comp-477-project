@@ -6,6 +6,7 @@
 #define COMP477PROJECT_EVENTHANDLER_H
 #include "helpers/IncludeHeader.h"
 #include "Camera.h"
+#include <memory>
 class EventHandler {
 private:
     static float mouseX;
@@ -14,8 +15,8 @@ private:
     static bool enableCursor;
     static bool fPress;
 public:
-    static Camera * camera;
-    static void init(GLFWwindow* window, Camera * camera);
+    static std::shared_ptr<Camera> camera;
+    static void init(GLFWwindow* window, std::shared_ptr<Camera> camera);
     static void processInput(GLFWwindow *window, float deltaTime);
     static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
     static void mouse_callback(GLFWwindow* window, double xpos, double ypos);

@@ -8,30 +8,39 @@
 #include "Renderer.h"
 #include "Camera.h"
 #include "Simulation.h"
+struct Params {
+    glm::vec3 boundaries;
+    glm::vec3 gravity;
+    glm::vec3 particleColor;
+    float viscosity;
+};
 class Scene {
 public:
-    Scene(Camera * camera);
+    explicit Scene(const std::shared_ptr<Camera>& camera);
     void render(float deltaTime);
+    void reset ();
+    void save();
     void setBoundaries(glm::vec3 newDimensions);
     void setFluid(glm::vec3 newPosition, glm::vec3 newDimensions);
     void setFluid();
     void setGravity(glm::vec3 gravity);
     void setViscosity(float viscosity);
+    void setColor(glm::vec3 color);
     glm::vec3 particleColor= glm::vec3(0.0,0.50f,1.0f);
     float particleRadius = 0.2f;
     int maxParticles = 20000;
-    int nbParticles;
-    bool play = true;
+    int nbParticles = 0;
+    bool play = false;
     bool start = false;
-    glm::vec3 initalBoundaries = glm::vec3(15.0f,20.0f,15.0f) ;
-    glm::vec3 boundaries;
+    glm::vec3 boundaries = glm::vec3(15.0f,20.0f,15.0f) ;
     glm::vec3 fluidPosition;
     glm::vec3 fluidDimensions;
-
+    glm::vec3 gravity = glm::vec3(0.0f, -9.81f, 0.0f);
+    float viscosity = 10.0f;
+    Params savedParams;
+    std::shared_ptr<Simulation> simulation;
 private:
-    Camera * camera;
-    Simulation * simulation;
-    Renderer * renderer;
+    std::shared_ptr<Renderer> renderer;
 };
 
 

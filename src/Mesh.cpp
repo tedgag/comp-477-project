@@ -11,7 +11,9 @@
 
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <utility>
-#include <assimp/scene.h>           // Output data structure
+#include <assimp/scene.h>
+
+// Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
 
 using namespace glm;
@@ -19,7 +21,6 @@ using namespace std;
 
 Mesh::Mesh() = default;
 Mesh::Mesh(const string& modelPath, const std::vector<std::string>& cubeMapFaces, std::vector<Vertex> verts) {
-
     if (verts.empty()) {
         loadAssImp(modelPath);
     } else {
@@ -132,14 +133,14 @@ bool Mesh::loadAssImp(const string& path){
 
     Assimp::Importer importer;
 
-    const aiScene* scene = importer.ReadFile(path, 0);
+    const aiScene * scene = importer.ReadFile(path, 0);
     if( !scene) {
         fprintf( stderr, importer.GetErrorString());
         getchar();
         return false;
     }
 
-    const aiMesh* mesh = scene->mMeshes[0]; // In this simple example code we always use the 1rst mesh (in OBJ files there is often only one anyway)
+    const aiMesh * mesh = scene->mMeshes[0]; // In this simple example code we always use the 1rst mesh (in OBJ files there is often only one anyway)
 
     for(unsigned int i = 0; i < mesh->mNumVertices; i++)
     {

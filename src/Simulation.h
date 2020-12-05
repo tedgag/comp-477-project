@@ -8,8 +8,10 @@
 class Simulation {
     public:
         Simulation(float particleRadius);
+
         void run(float deltaTime);
-        std::vector<Particle *> particles;
+        std::vector<std::shared_ptr<Particle>> particles;
+
 
         Grid * grid;
         float particleMass = 100.0f;

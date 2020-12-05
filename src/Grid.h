@@ -6,6 +6,8 @@
 #define COMP477PROJECT_GRID_H
 #include "Particle.h"
 #include <vector>
+#include <memory>
+
 class Grid {
 private:
     glm::vec3 boundaries;
@@ -18,13 +20,13 @@ private:
     const float displacement = 0.25f;
     glm::vec3 getCellPos(glm::vec3 position);
     int getCellHash(glm::vec3 position);
-    std::vector<Particle *> boundaryParticles;
+    std::vector<std::shared_ptr<Particle>> boundaryParticles;
     void generateBoundaryParticles();
 public:
     Grid(float cellSize, float particleRadius);
-    void findNeighbors(std::vector<Particle *> &particles, float rad);
+    void findNeighbors(std::vector<std::shared_ptr<Particle>> &particles, float rad);
     std::vector<glm::vec3> getCellInstances();
-    void collisionHandling(std::vector<Particle *> &particles);
+    void collisionHandling(std::vector<std::shared_ptr<Particle>> &particles);
     void resizeGrid(glm::vec3 boundaries);
 
 };
