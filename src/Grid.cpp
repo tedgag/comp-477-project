@@ -37,7 +37,7 @@ int Grid::getCellHash(glm::vec3 cellPos) {
     int hash = (int) (cellPos.x + dimensions.x * (cellPos.y + dimensions.y * cellPos.z));
     return hash;
 }
-void Grid::findNeighbors(std::vector<std::shared_ptr<Particle>> &particles, float rad) {
+void Grid::findNeighbors(std::vector<Particle * > &particles, float rad) {
 
     #pragma omp parallel for
     for(int c = 0; c < cells.size(); c++) {
@@ -117,7 +117,7 @@ std::vector<glm::vec3> Grid::getCellInstances() {
     }
     return cells;
 }
-void Grid::collisionHandling(std::vector<std::shared_ptr<Particle>> &particles) {
+void Grid::collisionHandling(std::vector<Particle * > &particles) {
     #pragma omp parallel for
     for (int i =0 ; i<particles.size(); i++) {
         auto p = particles[i];
@@ -143,7 +143,7 @@ void Grid::generateBoundaryParticles() {
     for(int i = 0; i < side; ++i) {
         for(int j = 0; j < side; ++j) {
             glm::vec2 pos = corner + glm::vec2(i, j) * spacing;
-            std::shared_ptr<Particle> p = std::make_shared<Particle>();
+            Particle *  p = new Particle;
             p->position = glm::vec3 (pos, 0.0f);
             boundaryParticles.push_back(p);
         }

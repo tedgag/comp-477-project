@@ -24,7 +24,7 @@ void Scene::render(float deltaTime) {
         simulation->run(deltaTime);
     std::vector<glm::vec3> positions;
     for (int i = 0; i < simulation->particles.size(); i++) {
-        std::shared_ptr<Particle> p = simulation->particles[i];
+        Particle *  p = simulation->particles[i];
         positions.push_back(p->position);
     }
     renderer->render(positions,particleColor,particleRadius);
@@ -65,12 +65,15 @@ void Scene::setFluid(glm::vec3 newPosition, glm::vec3 newDimensions) {
     setFluid();
 }
 void Scene::setFluid() {
+    for (int i =0; i <simulation->particles.size(); i++) {
+        delete simulation->particles[i];
+    }
     simulation->particles.clear();
     nbParticles = (int) (fluidDimensions.x * fluidDimensions.y * fluidDimensions.z);
     for (int i =-(int) fluidDimensions.x/2 ; i<(int) fluidDimensions.x/2 ; i++) {
         for (int j =-(int) fluidDimensions.y/2 ; j<(int) fluidDimensions.y/2; j++) {
             for (int k =-(int) fluidDimensions.z/2 ; k<(int) fluidDimensions.z/2 ; k++) {
-                std::shared_ptr<Particle> p = std::make_shared<Particle>();
+                Particle * p = new Particle;
                 p->position = glm::vec3((float)i,(float)j,(float)k) * particleRadius*2.0f + fluidPosition;
                 simulation->particles.push_back(p);
             }

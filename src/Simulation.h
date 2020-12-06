@@ -10,7 +10,7 @@ class Simulation {
         Simulation(float particleRadius);
 
         void run(float deltaTime);
-        std::vector<std::shared_ptr<Particle>> particles;
+        std::vector<Particle * > particles;
 
 
         Grid * grid;
