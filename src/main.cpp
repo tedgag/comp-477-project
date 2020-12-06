@@ -45,7 +45,7 @@ int main(){
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
     glEnable(GL_DEPTH_TEST);
-    glClearColor(0.0f, 0.5f, 0.5f, 1.0f);
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
 
     std::shared_ptr<Camera> camera = std::make_shared<Camera>(

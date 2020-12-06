@@ -5,12 +5,18 @@
 #include "Scene.h"
 
 #include <iostream>
+#include <utility>
 
 Scene::Scene(const std::shared_ptr<Camera> & camera) {
     this->simulation =  std::make_shared<Simulation>(particleRadius);
     this->renderer = std::make_shared<Renderer>(camera);
-    setBoundaries(glm::vec3(16.0f));
-    setFluid( boundaries/2.0f, glm::vec3(20));
+    setBoundaries(glm::vec3(12.0f));
+    setFluid(glm::vec3(6.0f), glm::vec3(20));
+    setMass(particleMass);
+    setViscosity(viscosity);
+    setGravity(gravity);
+    setSkybox(true);
+    setBounds(true);
 }
 
 void Scene::render(float deltaTime) {
@@ -41,10 +47,10 @@ void Scene::setBoundaries(glm::vec3 newBoundaries) {
     simulation->grid->resizeGrid(boundaries);
 }
 void Scene::setFluid(glm::vec3 newPosition, glm::vec3 newDimensions) {
-    if (newPosition == fluidPosition && newDimensions == fluidDimensions)
+    if (start || (newPosition == fluidPosition && newDimensions == fluidDimensions))
         return;
 
-    if (start || (int) (newDimensions.x * newDimensions.y * newDimensions.z) > maxParticles)
+    if ((int) (newDimensions.x * newDimensions.y * newDimensions.z) > maxParticles)
         return;
 
     for (int i=0; i<3; i++) {
@@ -83,6 +89,10 @@ void Scene::setViscosity(float visc) {
 void Scene::setColor(glm::vec3 color) {
     particleColor = color;
 }
+void Scene::setMass(float mass) {
+    particleMass = mass;
+    simulation->particleMass = mass;
+}
 void Scene::reset() {
     play = false;
     start = false;
@@ -100,5 +110,14 @@ void Scene::save() {
     savedParams.viscosity = viscosity;
     savedParams.gravity = gravity;
     savedParams.particleColor = particleColor;
+}
+
+void Scene::setSkybox(bool enabled) {
+    enableSkybox = enabled;
+    renderer->enableSkybox = enabled;
+}
+void Scene::setBounds(bool enabled) {
+    enableBounds = enabled;
+    renderer->enableBounds = enabled;
 }
 

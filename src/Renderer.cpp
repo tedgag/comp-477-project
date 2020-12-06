@@ -26,12 +26,12 @@ Renderer::Renderer(std::shared_ptr<Camera> camera) {
             "../resources/shaders/sky_shader.frag"
     );
     std::vector<std::string> faces {
-            "../resources/assets/textures/skybox/lake/px.png",
-            "../resources/assets/textures/skybox/lake/nx.png",
-            "../resources/assets/textures/skybox/lake/py.png",
-            "../resources/assets/textures/skybox/lake/ny.png",
-            "../resources/assets/textures/skybox/lake/pz.png",
-            "../resources/assets/textures/skybox/lake/nz.png",
+            "../resources/assets/textures/skybox/mountain/px.png",
+            "../resources/assets/textures/skybox/mountain/nx.png",
+            "../resources/assets/textures/skybox/mountain/py.png",
+            "../resources/assets/textures/skybox/mountain/ny.png",
+            "../resources/assets/textures/skybox/mountain/pz.png",
+            "../resources/assets/textures/skybox/mountain/nz.png",
     };
     boxModel = std::make_shared<Model>(
             std::make_shared<Mesh>("../resources/assets/models/box.obj"),
@@ -44,7 +44,6 @@ Renderer::Renderer(std::shared_ptr<Camera> camera) {
     sceneModels.push_back(boxModel);
     setupSkybox(faces);
     particlesBuffer = setupInstancedBuffer(particleModel);
-    //gridRenderer = new InstancedRenderer(particleShader, camera, boxModel, h/2);
 }
 
 void Renderer::render(std::vector<glm::vec3> positions, glm::vec3 particleColor, float particleRadius) {
@@ -53,17 +52,18 @@ void Renderer::render(std::vector<glm::vec3> positions, glm::vec3 particleColor,
     sceneShader->use();
 
     // Rendering skybox
-
-    skyShader->use();
-    camera->setShaderUniformsStatic(skyShader);
-    glDepthFunc(GL_LEQUAL);
-    glBindVertexArray(skyBoxModel->mesh->VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, skyBoxModel->mesh->VBO);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxModel->mesh->texture);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindVertexArray(0);
-    glDepthFunc(GL_LESS);
+    if(enableSkybox) {
+        skyShader->use();
+        camera->setShaderUniformsStatic(skyShader);
+        glDepthFunc(GL_LEQUAL);
+        glBindVertexArray(skyboxModel->mesh->VAO);
+        glBindBuffer(GL_ARRAY_BUFFER, skyboxModel->mesh->VBO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxModel->mesh->texture);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
+        glDepthFunc(GL_LESS);
+    }
     // Rendering particles
 
     particleShader->use();
@@ -76,10 +76,11 @@ void Renderer::render(std::vector<glm::vec3> positions, glm::vec3 particleColor,
     glDrawElementsInstanced(GL_TRIANGLES, particleModel->mesh->indices.size(), GL_UNSIGNED_INT, 0, positions.size());
 
     // Rendering scene models
-
-    camera->setShaderUniforms(sceneShader);
-    for (auto & model : sceneModels) {
-        model->draw(*sceneShader, GL_TRIANGLES);
+    if (enableBounds) {
+        camera->setShaderUniforms(sceneShader);
+        for (auto & model : sceneModels) {
+            model->draw(*sceneShader, GL_TRIANGLES);
+        }
     }
 }
 
@@ -143,7 +144,7 @@ void Renderer::setupSkybox(std::vector<std::string> faces) {
             {glm::vec3(-1.0f, -1.0f, 1.0f)},
             {glm::vec3(1.0f, -1.0f, 1.0f)},
     };
-    skyBoxModel = std::make_shared<Model>(
+    skyboxModel = std::make_shared<Model>(
             std::make_shared<Mesh>(
             "../resources/assets/models/cube.obj",
             faces,

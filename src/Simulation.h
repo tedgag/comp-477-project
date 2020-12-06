@@ -14,11 +14,11 @@ class Simulation {
 
 
         Grid * grid;
-        float particleMass = 100.0f;
+        float particleMass;
         float h, hs;
         float particleRadius;
-        glm::vec3 gravity = glm::vec3(0.0f, -9.81f, 0.0f);
-        float viscosity =10.0f;
+        glm::vec3 gravity;
+        float viscosity;
     private:
         const double pi = 3.14159265358979323846;
         const float restDensity = 1000.0f;

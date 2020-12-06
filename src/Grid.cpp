@@ -35,12 +35,6 @@ int Grid::getCellHash(glm::vec3 cellPos) {
     }
 
     int hash = (int) (cellPos.x + dimensions.x * (cellPos.y + dimensions.y * cellPos.z));
-    if (hash >= cellCount) {
-        std::cout << to_string(boundaries/cellSize) << std::endl;
-        std::cout << to_string(cellPos) << std::endl;
-        //std::cout << hash << std::endl;
-        //std::cout << cellCount << std::endl;
-    }
     return hash;
 }
 void Grid::findNeighbors(std::vector<std::shared_ptr<Particle>> &particles, float rad) {
@@ -82,7 +76,7 @@ void Grid::findNeighbors(std::vector<std::shared_ptr<Particle>> &particles, floa
         float boundaryDist = 0.5f * rad;
         for (int i = 0 ; i< 3; i++) {
             if(p->position[i]< boundaryDist || p->position[i] > (boundaries[i]-boundaryDist)) {
-                for(auto bp: boundaryParticles) {
+                for(const auto& bp: boundaryParticles) {
                     auto bpPos = bp->position;
                     glm::vec3 gPos;
                     switch (i) {
@@ -130,11 +124,13 @@ void Grid::collisionHandling(std::vector<std::shared_ptr<Particle>> &particles) 
         for (int j=0; j< 3 ; j++) {
             if (p->position[j] < 0.0f) {
                 p->velocity[j] *= boundDamping;
-                p->position[j] += - p->position[j] * 1.5;
+                //p->position[j] += - p->position[j] * 1.5;
+                p->position[j] = 0.0f;
             }
             if (p->position[j] >= boundaries[j] ) {
                 p->velocity[j] *= boundDamping;
-                p->position[j] -= (p->position[j] - boundaries[j]) * 1.5;
+                //p->position[j] -= (p->position[j] - boundaries[j]) * 1.5;
+                p->position[j] = boundaries[j] - 0.01f;
             }
         }
     }

@@ -26,17 +26,23 @@ public:
     void setGravity(glm::vec3 gravity);
     void setViscosity(float viscosity);
     void setColor(glm::vec3 color);
+    void setMass(float particleMass);
+    void setSkybox(bool enabled);
+    void setBounds(bool enabled);
     glm::vec3 particleColor= glm::vec3(0.0,0.50f,1.0f);
     float particleRadius = 0.2f;
+    float particleMass = 60.0f;
     int maxParticles = 20000;
     int nbParticles = 0;
+    bool enableSkybox;
+    bool enableBounds;
     bool play = false;
     bool start = false;
     glm::vec3 boundaries = glm::vec3(15.0f,20.0f,15.0f) ;
     glm::vec3 fluidPosition;
     glm::vec3 fluidDimensions;
     glm::vec3 gravity = glm::vec3(0.0f, -9.81f, 0.0f);
-    float viscosity = 10.0f;
+    float viscosity = 20.0f;
     Params savedParams;
     std::shared_ptr<Simulation> simulation;
 private:

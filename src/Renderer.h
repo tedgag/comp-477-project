@@ -13,6 +13,7 @@ class Renderer {
         Renderer(std::shared_ptr<Camera> camera);
         void render(std::vector<glm::vec3> positions, glm::vec3 particleColor, float particleRadius);
         std::shared_ptr<Model> boxModel;
+        bool enableSkybox, enableBounds;
     private:
         GLuint setupInstancedBuffer(std::shared_ptr<Model> model);
         void setupSkybox( std::vector<std::string> faces);
@@ -20,7 +21,7 @@ class Renderer {
         std::vector<std::shared_ptr<Model>> models;
         GLuint particlesBuffer;
         std::shared_ptr<Model> particleModel;
-        std::shared_ptr<Model> skyBoxModel;
+        std::shared_ptr<Model> skyboxModel;
         std::vector<std::shared_ptr<Model>> sceneModels;
         std::shared_ptr<Shader> sceneShader;
         std::shared_ptr<Shader> particleShader;
