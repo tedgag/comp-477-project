@@ -55,9 +55,9 @@ void Grid::findNeighbors(std::vector<Particle * > &particles, float rad) {
         p->neighbors.clear();
         p->ghosts.clear();
 
-        for (int k = -1; k <= 1; k++) {
+        for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
-                for (int i = -1; i <= 1; i++) {
+                for (int k = -1; k <= 1; k++) {
 
                     int hash = getCellHash(cellPos + glm::vec3((float) i, (float) j, (float) k));
                     if (hash != -1) {
@@ -106,17 +106,6 @@ void Grid::findNeighbors(std::vector<Particle * > &particles, float rad) {
     }
 }
 
-std::vector<glm::vec3> Grid::getCellInstances() {
-    std::vector<glm::vec3> cells;
-    for (int i = 0; i < (int)(boundaries.x/cellSize); i++) {
-        for (int j = 0; j < (int)(boundaries.y/cellSize); j++) {
-            for (int k = 0; k < (int)(boundaries.z/cellSize); k++) {
-                cells.push_back(glm::vec3(i,j,k)*cellSize + cellSize/2);
-            }
-        }
-    }
-    return cells;
-}
 void Grid::collisionHandling(std::vector<Particle * > &particles) {
     #pragma omp parallel for
     for (int i =0 ; i<particles.size(); i++) {
@@ -124,13 +113,11 @@ void Grid::collisionHandling(std::vector<Particle * > &particles) {
         for (int j=0; j< 3 ; j++) {
             if (p->position[j] < 0.0f) {
                 p->velocity[j] *= boundDamping;
-                //p->position[j] += - p->position[j] * 1.5;
                 p->position[j] = 0.0f;
             }
-            if (p->position[j] >= boundaries[j] ) {
+            if (p->position[j] > boundaries[j] ) {
                 p->velocity[j] *= boundDamping;
-                //p->position[j] -= (p->position[j] - boundaries[j]) * 1.5;
-                p->position[j] = boundaries[j] - 0.01f;
+                p->position[j] = boundaries[j];
             }
         }
     }
@@ -142,16 +129,14 @@ void Grid::generateBoundaryParticles() {
 
     for(int i = 0; i < side; ++i) {
         for(int j = 0; j < side; ++j) {
-            glm::vec2 pos = corner + glm::vec2(i, j) * spacing;
             Particle *  p = new Particle;
-            p->position = glm::vec3 (pos, 0.0f);
+            p->position = glm::vec3 (corner + glm::vec2(i, j) * spacing, 0.0f);
             boundaryParticles.push_back(p);
         }
     }
 }
 
 void Grid::resizeGrid(glm::vec3 newBoundaries) {
-
     this->boundaries = newBoundaries;
     this->dimensions = glm::vec3(glm::ceil(newBoundaries.x / cellSize) ,
             glm::ceil(newBoundaries.y / cellSize) ,

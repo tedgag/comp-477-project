@@ -55,7 +55,7 @@ int main(){
             -15.0f);
     std::shared_ptr<Scene> scene =  std::make_shared<Scene>(camera);
     UserInterface::init(window, glsl_version);
-    EventHandler::init(window, camera);
+    EventHandler::init(window, camera, scene);
     // Main loop
     float lastFrame = 0.0f;
     float deltaTime = 0.0f;
@@ -69,7 +69,10 @@ int main(){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         EventHandler::processInput(window, deltaTime);
         scene->render(deltaTime);
-        UserInterface::render(scene);
+        if (scene->showMenu) {
+            UserInterface::render(scene, deltaTime);
+        }
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

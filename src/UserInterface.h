@@ -10,7 +10,7 @@
 class UserInterface {
 public:
     static void init(GLFWwindow *window, const char* glsl_version);
-    static void render(const std::shared_ptr<Scene>&scene);
+    static void render(const std::shared_ptr<Scene>&scene, float deltaTime);
 };
 
 

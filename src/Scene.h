@@ -31,11 +31,12 @@ public:
     void setBounds(bool enabled);
     glm::vec3 particleColor= glm::vec3(0.0,0.50f,1.0f);
     float particleRadius = 0.2f;
-    float particleMass = 60.0f;
+    float particleMass = 100.0f;
     int maxParticles = 20000;
     int nbParticles = 0;
     bool enableSkybox;
     bool enableBounds;
+    bool showMenu = true;
     bool play = false;
     bool start = false;
     glm::vec3 boundaries = glm::vec3(15.0f,20.0f,15.0f) ;

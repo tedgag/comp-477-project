@@ -54,7 +54,7 @@ void Scene::setFluid(glm::vec3 newPosition, glm::vec3 newDimensions) {
         return;
 
     for (int i=0; i<3; i++) {
-        if (newDimensions[i] * particleRadius + newPosition[i] - particleRadius * 2.0f> boundaries[i] ||
+        if (newDimensions[i] * particleRadius + newPosition[i] > boundaries[i] ||
             newPosition[i] - newDimensions[i] * particleRadius < 0.0f ) {
             return;
         }
@@ -70,11 +70,15 @@ void Scene::setFluid() {
     }
     simulation->particles.clear();
     nbParticles = (int) (fluidDimensions.x * fluidDimensions.y * fluidDimensions.z);
-    for (int i =-(int) fluidDimensions.x/2 ; i<(int) fluidDimensions.x/2 ; i++) {
-        for (int j =-(int) fluidDimensions.y/2 ; j<(int) fluidDimensions.y/2; j++) {
-            for (int k =-(int) fluidDimensions.z/2 ; k<(int) fluidDimensions.z/2 ; k++) {
+    for (int i =0 ; i<(int)fluidDimensions.x ; i++) {
+        for (int j =0; j<(int)fluidDimensions.y; j++) {
+            for (int k =0; k<(int) fluidDimensions.z; k++) {
                 Particle * p = new Particle;
-                p->position = glm::vec3((float)i,(float)j,(float)k) * particleRadius*2.0f + fluidPosition;
+                glm::vec3 pos = glm::vec3(
+                        -fluidDimensions.x/2 + i + particleRadius,
+                        -fluidDimensions.y/2 + j + particleRadius,
+                        -fluidDimensions.z/2 + k + particleRadius);
+                p->position = pos * particleRadius*2.0f + fluidPosition;
                 simulation->particles.push_back(p);
             }
         }

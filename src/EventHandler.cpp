@@ -9,10 +9,14 @@ bool EventHandler::firstMouse = true;
 bool EventHandler::enableCursor = true;
 bool EventHandler::fPress = false;
 std::shared_ptr<Camera> EventHandler::camera = nullptr;
+std::shared_ptr<Scene> EventHandler::scene = nullptr;
+bool showMenu = true;
+bool hPress = false;
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-void EventHandler::init(GLFWwindow * window, std::shared_ptr<Camera> cam) {
+void EventHandler::init(GLFWwindow * window, std::shared_ptr<Camera> cam, std::shared_ptr<Scene> s) {
     camera = cam;
+    scene = s;
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -45,7 +49,19 @@ void EventHandler::processInput(GLFWwindow *window, float deltaTime)
     if (glfwGetKey(window, GLFW_KEY_F) == GLFW_RELEASE) {
         fPress = false;
     }
-
+    if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS && !hPress) {
+        hPress = true;
+        if (showMenu) {
+            showMenu = false;
+            scene->showMenu = false;
+        } else {
+            showMenu = true;
+            scene->showMenu = true;
+        }
+    }
+    if (glfwGetKey(window, GLFW_KEY_H) == GLFW_RELEASE) {
+        hPress = false;
+    }
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
         camera->movementSpeed = 5.0f;
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)

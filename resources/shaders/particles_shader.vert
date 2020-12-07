@@ -17,6 +17,7 @@ out vec3 fragPos;
 
 void main()
 {
+
     mat4 model = mat4(
         vec4(size, 0.0f, 0.0f, 0.0f),
         vec4(0.0f, size, 0.0f, 0.0f),

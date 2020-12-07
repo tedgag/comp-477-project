@@ -8,9 +8,11 @@
 
 Simulation::Simulation(float particleRadius) {
     this->particleRadius = particleRadius;
-    h = 3*particleRadius;
+    h = 0.6f;
     hs = h * h;
     grid = new Grid( h, particleRadius);
+    poly6 = 315.0f/(64.0f*pi*pow(h, 9.0f));
+    spiky = -45.0f/(pi*pow(h, 6.0f));
 }
 
 void Simulation::run(float deltaTime) {
@@ -18,12 +20,8 @@ void Simulation::run(float deltaTime) {
     grid->collisionHandling(particles);
     grid->findNeighbors(particles, h);
     computeDensityPressure();
-    float step;
-    if (deltaTime < 0.05f) {
-        step = 2.0f * deltaTime * particleRadius;
-    } else {
-        step = 0.1f * particleRadius;
-    }
+    float step = 0.02f;
+
     computeForces();
     timeIntegration(step);
 
@@ -32,28 +30,28 @@ void Simulation::computeDensityPressure() {
     #pragma omp parallel for
     for (int i =0 ; i<particles.size(); i++) {
         Particle *  p = particles[i];
-        p->density = poly6()*pow(hs, 3.0f);
+        // Initial density cannot be zero
+        p->density = pow(hs, 3.0f);
         for(int j =0 ; j<p->neighbors.size(); j++)
         {
             auto n = p->neighbors[j];
             auto r = p->position - n->position;
             float r2 = glm::length(r) * glm::length(r);
-
             if(r2 < hs)
             {
                 // Density
-                p->density += poly6()*pow(hs-r2, 3.0f);
+                p->density += poly6*pow(hs-r2, 3.0f);
             }
         }
 
         p->density *= particleMass;
-
         // Pressure
         float ratio = p->density/restDensity;
+        // The ratio has to be greater than one so the pressure is not negative
         if(ratio < 1.0f) {
             p->pressure = 0.0f;
         } else {
-            p->pressure = pow(ratio, 7.0f) -1.0f;
+            p->pressure = pressureConstant * (pow(ratio, 7.0f) - 1.0f);
         }
     }
 }
@@ -73,10 +71,9 @@ void Simulation::computeForces() {
                 // Pressure force
                 float kn = n->pressure / (n->density * n->density);
                 float k = (kp + kn);
-                accel -= glm::normalize(p->position - n->position)* k * spiky()*(float)pow(h-r,2.0f);
-
+                accel -= glm::normalize(p->position - n->position)* k * spiky*(float)pow(h-r,2.0f)/p->density;
                 // Viscosity force
-                accel += viscosity*(n->velocity - p->velocity)/n->density * poly6()*(float)pow(hs-r2, 3.0f);
+                accel += viscosity*(n->velocity - p->velocity)/n->density * poly6*(float)pow(hs-r2, 3.0f);
             }
 
         }
@@ -87,12 +84,12 @@ void Simulation::computeForces() {
             auto r = glm::length(gDist);
             float r2 = r * r;
             if (r2 <= hs && r2 > 0) {
-                accel -= glm::normalize(gDist) * kp*spiky()*(float)pow(h-r,2.0f);
+                accel -= glm::normalize(gDist) * kp*spiky*(float)pow(h-r,2.0f)/p->density;
             }
         }
-
-        // Gravitational force
+        // Constant terms
         accel *= particleMass;
+        // Gravitational force
         accel += gravity;
         p->acceleration = accel;
 
@@ -106,14 +103,5 @@ void Simulation::timeIntegration( float deltaTime) {
         p->velocity += p->acceleration * deltaTime;
         p->position += p->velocity * deltaTime;
     }
-}
-
-
-float Simulation::poly6() {
-    return 315.0f/(64.0f*pi*pow(h, 9.0f));
-}
-
-float Simulation::spiky() {
-    return -45.0f/(pi*pow(h, 6.0f));;
 }
 

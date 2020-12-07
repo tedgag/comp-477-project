@@ -9,12 +9,11 @@
 #include <imgui_internal.h>
 #include <imgui_impl_opengl3.h>
 #include <iostream>
-
-float averageFrameRate = 0;
-float averageTime = 0;
-float totalFrameRate = 0;
-float totalTime = 0;
+float time = 0;
 float frameCount = 0;
+float averageFPS = 0;
+int seconds = 0;
+int lastSeconds = 0;
 void UserInterface::init(GLFWwindow *window, const char* glsl_version) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -26,26 +25,25 @@ void UserInterface::init(GLFWwindow *window, const char* glsl_version) {
     ImGui_ImplOpenGL3_Init(glsl_version);
 }
 
-void UserInterface::render(const std::shared_ptr<Scene> & scene) {
+void UserInterface::render(const std::shared_ptr<Scene> & scene, float deltaTime) {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-    bool show_demo_window = true;
-    float currentFrameRate = ImGui::GetIO().Framerate;
-    float currentTime = 1000.0f / currentFrameRate;
-    ImGui::ShowDemoWindow(&show_demo_window);
-    ImGui::SetNextWindowSize(ImVec2(400, 680), 0);
+    ImGui::SetNextWindowSize(ImVec2(380, 460), 0);
     ImGui::Begin("Controller");                          // Create a window called "Hello, world!" and append into it.
     {
-        ImGui::Text("Current: %.3f ms/frame (%.1f FPS)", currentTime,currentFrameRate);
-        ImGui::Text("Last: %.3f ms/frame (%.1f FPS)", averageTime,averageFrameRate);
+        ImGui::Text("Current: %.3f ms/frame (%.1f FPS)", 1000.0f /ImGui::GetIO().Framerate,ImGui::GetIO().Framerate);
+        ImGui::Text("Last: %.3f ms/frame (%.1f FPS) in %d seconds", 1000.0f/averageFPS, averageFPS, lastSeconds);
         ImGui::Text("Particles: %d (Max: %d)", scene->nbParticles, scene->maxParticles);
 
         if (scene->start) {
             if (scene->play) {
                 frameCount ++;
-                totalFrameRate += currentFrameRate;
-                totalTime += currentTime;
+                time += deltaTime;
+                if (time >= 1.0f) {
+                    seconds ++;
+                    time= 0.0f;
+                }
                 if (ImGui::Button("Stop"))
                     scene->play = false;
             } else {
@@ -54,16 +52,16 @@ void UserInterface::render(const std::shared_ptr<Scene> & scene) {
             }
             ImGui::SameLine();
             if (ImGui::Button("Reset")) {
-                averageFrameRate = totalFrameRate / frameCount;
-                averageTime = totalTime / frameCount;
+                averageFPS =frameCount/(float)seconds;
+                lastSeconds = seconds;
                 scene->reset();
             }
         } else {
             if (ImGui::Button("Start")) {
                 scene->save();
-                averageFrameRate = 0;
-                averageTime = 0;
                 frameCount = 0;
+                time = 0;
+                seconds = 0;
             }
         }
 
@@ -71,7 +69,7 @@ void UserInterface::render(const std::shared_ptr<Scene> & scene) {
             float bounds[3] = {scene->boundaries.x,
                                scene->boundaries.y,
                                scene->boundaries.z};
-            ImGui::DragFloat3("bounds", bounds,0.02f, 1.0f, 40.0f);
+            ImGui::DragFloat3("bounds", bounds,0.02f, 1.0f, 25.0f);
             scene->setBoundaries(glm::vec3(bounds[0], bounds[1], bounds[2]));
             float gravity[3] = {scene->gravity.x,
                                 scene->gravity.y,
@@ -94,14 +92,14 @@ void UserInterface::render(const std::shared_ptr<Scene> & scene) {
             float pos[3] = {scene->fluidPosition.x, scene->fluidPosition.y, scene->fluidPosition.z};
             float col[3] = {scene->particleColor.x, scene->particleColor.y,scene->particleColor.z};
 
-            ImGui::DragFloat3("position", pos, 0.01f, 0.0f, 40.0f);
-            ImGui::SliderInt3("dimensions", dimensions, 2, 40);
+            ImGui::DragFloat3("position", pos, 0.01f, 0.0f, 25.0f);
+            ImGui::SliderInt3("dimensions", dimensions, 0, 40);
             ImGui::ColorEdit3("color", col);
             float viscosity = scene->viscosity;
-            ImGui::DragFloat("viscosity", &viscosity,0.02f, 0.0f, 80.0f);
+            ImGui::DragFloat("viscosity", &viscosity,0.02f, 0.0f, 60.0f);
             scene->setViscosity(viscosity);
             float particleMass = scene->particleMass;
-            ImGui::DragFloat("mass", &particleMass,0.02f, 20.0f, 160.0f);
+            ImGui::DragFloat("mass", &particleMass,0.05f, 40.0f, 160.0f);
             scene->setMass(particleMass);
             scene->setFluid(glm::vec3(pos[0], pos[1], pos[2]),glm::vec3(dimensions[0], dimensions[1], dimensions[2]));
             scene->setColor(glm::vec3(col[0],col[1],col[2]));
@@ -112,6 +110,7 @@ void UserInterface::render(const std::shared_ptr<Scene> & scene) {
             ImGui::Text("F: enable/disable Free Camera Mode");
             ImGui::Text("WASD: move around in direction of cursor");
             ImGui::Text("SHIFT (hold): move slightly faster");
+            ImGui::Text("H: show/hide menu");
             ImGui::Text("ESC: close the program");
         }
         // Buttons return true when clicked (most widgets return true when edited/activated)
