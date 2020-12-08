@@ -22,7 +22,6 @@ glm::vec3 Grid::getCellPos(glm::vec3 pos){
     if (pos.z == boundaries.z) {
         pos.z -= 0.01f;
     }
-
     return glm::floor(pos/cellSize);
 }
 
@@ -50,20 +49,19 @@ void Grid::findNeighbors(std::vector<Particle * > &particles, float rad) {
 
     #pragma omp parallel for
     for(int m = 0; m < particles.size(); m++) {
-        auto p = particles[m];
-        glm::vec3 cellPos = getCellPos(p->position);
+        const auto p = particles[m];
+        const glm::vec3 cellPos = getCellPos(p->position);
         p->neighbors.clear();
         p->ghosts.clear();
 
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
                 for (int k = -1; k <= 1; k++) {
-
                     int hash = getCellHash(cellPos + glm::vec3((float) i, (float) j, (float) k));
                     if (hash != -1) {
                         for (auto & n : cells[hash]) {
-                            auto neighbor = particles[n];
-                            float dist = glm::distance(p->position, neighbor->position);
+                            const auto neighbor = particles[n];
+                            const float dist = glm::distance(p->position, neighbor->position);
                             if (dist <= rad && m != n)
                                 p->neighbors.push_back(neighbor);
                         }
@@ -77,7 +75,7 @@ void Grid::findNeighbors(std::vector<Particle * > &particles, float rad) {
         for (int i = 0 ; i< 3; i++) {
             if(p->position[i]< boundaryDist || p->position[i] > (boundaries[i]-boundaryDist)) {
                 for(const auto& bp: boundaryParticles) {
-                    auto bpPos = bp->position;
+                    const auto bpPos = bp->position;
                     glm::vec3 gPos;
                     switch (i) {
                         case 0:
@@ -96,7 +94,7 @@ void Grid::findNeighbors(std::vector<Particle * > &particles, float rad) {
                                     + glm::vec3(bpPos[0], bpPos[1], cellSize + (boundaryDist + bpPos[2]));
                     }
                     gPos +=  cellPos * cellSize;
-                    float dist = glm::distance(p->position, gPos);
+                    const float dist = glm::distance(p->position, gPos);
                     if(dist <= rad) {
                         p->ghosts.push_back(p->position - gPos);
                     }
@@ -109,7 +107,7 @@ void Grid::findNeighbors(std::vector<Particle * > &particles, float rad) {
 void Grid::collisionHandling(std::vector<Particle * > &particles) {
     #pragma omp parallel for
     for (int i =0 ; i<particles.size(); i++) {
-        auto p = particles[i];
+        const auto p = particles[i];
         for (int j=0; j< 3 ; j++) {
             if (p->position[j] < 0.0f) {
                 p->velocity[j] *= boundDamping;
@@ -124,13 +122,13 @@ void Grid::collisionHandling(std::vector<Particle * > &particles) {
 }
 void Grid::generateBoundaryParticles() {
     const int side = 13;
-    const float spacing = 3.0f*cellSize/side;
-    const auto corner = glm::vec2(spacing * 0.5f -  3.0f * cellSize / 2);
+    const float dist = 3.0f * cellSize / side;
+    const auto corner = glm::vec2(dist * 0.5f -  3.0f * cellSize / 2);
 
     for(int i = 0; i < side; ++i) {
         for(int j = 0; j < side; ++j) {
-            Particle *  p = new Particle;
-            p->position = glm::vec3 (corner + glm::vec2(i, j) * spacing, 0.0f);
+            auto p = new Particle();
+            p->position = glm::vec3 (corner + glm::vec2(i, j) * dist, 0.0f);
             boundaryParticles.push_back(p);
         }
     }

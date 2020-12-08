@@ -9,6 +9,7 @@
 #include <imgui_internal.h>
 #include <imgui_impl_opengl3.h>
 #include <iostream>
+// For performance computations
 float time = 0;
 float frameCount = 0;
 float averageFPS = 0;
@@ -29,8 +30,8 @@ void UserInterface::render(const std::shared_ptr<Scene> & scene, float deltaTime
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-    ImGui::SetNextWindowSize(ImVec2(380, 460), 0);
-    ImGui::Begin("Controller");                          // Create a window called "Hello, world!" and append into it.
+    ImGui::SetNextWindowSize(ImVec2(360, 500), 0);
+    ImGui::Begin("Controller");
     {
         ImGui::Text("Current: %.3f ms/frame (%.1f FPS)", 1000.0f /ImGui::GetIO().Framerate,ImGui::GetIO().Framerate);
         ImGui::Text("Last: %.3f ms/frame (%.1f FPS) in %d seconds", 1000.0f/averageFPS, averageFPS, lastSeconds);
@@ -113,7 +114,6 @@ void UserInterface::render(const std::shared_ptr<Scene> & scene, float deltaTime
             ImGui::Text("H: show/hide menu");
             ImGui::Text("ESC: close the program");
         }
-        // Buttons return true when clicked (most widgets return true when edited/activated)
     }
     ImGui::End();
 

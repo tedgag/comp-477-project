@@ -10,33 +10,30 @@ Simulation::Simulation(float particleRadius) {
     this->particleRadius = particleRadius;
     h = 0.6f;
     hs = h * h;
+    timeStep = 0.02;
     grid = new Grid( h, particleRadius);
     poly6 = 315.0f/(64.0f*pi*pow(h, 9.0f));
     spiky = -45.0f/(pi*pow(h, 6.0f));
 }
 
 void Simulation::run(float deltaTime) {
-
     grid->collisionHandling(particles);
     grid->findNeighbors(particles, h);
     computeDensityPressure();
-    float step = 0.02f;
-
     computeForces();
-    timeIntegration(step);
-
+    timeIntegration(timeStep);
 }
 void Simulation::computeDensityPressure() {
     #pragma omp parallel for
     for (int i =0 ; i<particles.size(); i++) {
-        Particle *  p = particles[i];
+        const auto p = particles[i];
         // Initial density cannot be zero
         p->density = pow(hs, 3.0f);
         for(int j =0 ; j<p->neighbors.size(); j++)
         {
-            auto n = p->neighbors[j];
-            auto r = p->position - n->position;
-            float r2 = glm::length(r) * glm::length(r);
+            const auto n = p->neighbors[j];
+            const auto r = p->position - n->position;
+            const float r2 = glm::length(r) * glm::length(r);
             if(r2 < hs)
             {
                 // Density
@@ -46,7 +43,7 @@ void Simulation::computeDensityPressure() {
 
         p->density *= particleMass;
         // Pressure
-        float ratio = p->density/restDensity;
+        const float ratio = p->density/restDensity;
         // The ratio has to be greater than one so the pressure is not negative
         if(ratio < 1.0f) {
             p->pressure = 0.0f;
@@ -60,17 +57,17 @@ void Simulation::computeForces() {
     for (int i =0 ; i<particles.size(); i++) {
         glm::vec3 accel = glm::vec3(0.0f,0.0f,0.0f);
 
-        Particle *  p = particles[i];
-        float kp = p->pressure / (p->density * p->density);
+        const auto  p = particles[i];
+        const float kp = p->pressure / (p->density * p->density);
         // Regular neighbors
         for (int j =0 ; j<p->neighbors.size(); j++) {
-            Particle *  n = p->neighbors[j];
-            float r = glm::length(p->position - n->position);
-            float r2 = r * r;
+            const auto n = p->neighbors[j];
+            const float r = glm::length(p->position - n->position);
+            const float r2 = r * r;
             if (r2 <= hs && r2 > 0) {
                 // Pressure force
-                float kn = n->pressure / (n->density * n->density);
-                float k = (kp + kn);
+                const float kn = n->pressure / (n->density * n->density);
+                const float k = (kp + kn);
                 accel -= glm::normalize(p->position - n->position)* k * spiky*(float)pow(h-r,2.0f)/p->density;
                 // Viscosity force
                 accel += viscosity*(n->velocity - p->velocity)/n->density * poly6*(float)pow(hs-r2, 3.0f);
@@ -80,9 +77,9 @@ void Simulation::computeForces() {
 
         // Ghost neighbors (only check for pressure force)
         for(int j = 0; j< p->ghosts.size(); j++) {
-            auto gDist = p->ghosts[j];
-            auto r = glm::length(gDist);
-            float r2 = r * r;
+            const auto gDist = p->ghosts[j];
+            const auto r = glm::length(gDist);
+            const float r2 = r * r;
             if (r2 <= hs && r2 > 0) {
                 accel -= glm::normalize(gDist) * kp*spiky*(float)pow(h-r,2.0f)/p->density;
             }
@@ -92,14 +89,12 @@ void Simulation::computeForces() {
         // Gravitational force
         accel += gravity;
         p->acceleration = accel;
-
     }
-
 }
 void Simulation::timeIntegration( float deltaTime) {
     #pragma omp parallel for
     for (int i =0 ; i<particles.size(); i++) {
-        auto p = particles[i];
+        const auto p = particles[i];
         p->velocity += p->acceleration * deltaTime;
         p->position += p->velocity * deltaTime;
     }

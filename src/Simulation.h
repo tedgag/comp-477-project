@@ -16,18 +16,18 @@ class Simulation {
         float particleMass;
         float h, hs;
         float particleRadius;
+        float timeStep;
         glm::vec3 gravity;
         float viscosity;
     private:
         const double pi = 3.14159265358979323846;
         const float restDensity = 1000.0f;
         const float pressureConstant = 2000.0f;
+        float poly6;
+        float spiky;
         void timeIntegration( float deltaTime);
         void computeDensityPressure();
         void computeForces();
-        float poly6;
-        float spiky;
-
 };
 
 
