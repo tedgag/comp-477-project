@@ -32,7 +32,7 @@ public:
     glm::vec3 particleColor= glm::vec3(0.0,0.50f,1.0f);
     float particleRadius = 0.2f;
     float particleMass = 100.0f;
-    int maxParticles = 20000;
+    int maxParticles = 100000;
     int nbParticles = 0;
     bool enableSkybox;
     bool enableBounds;

@@ -10,7 +10,7 @@
 #include <imgui_impl_opengl3.h>
 #include <iostream>
 // For performance computations
-float time = 0;
+float currentTime = 0;
 float frameCount = 0;
 float averageFPS = 0;
 int seconds = 0;
@@ -40,10 +40,10 @@ void UserInterface::render(const std::shared_ptr<Scene> & scene, float deltaTime
         if (scene->start) {
             if (scene->play) {
                 frameCount ++;
-                time += deltaTime;
-                if (time >= 1.0f) {
+                currentTime += deltaTime;
+                if (currentTime >= 1.0f) {
                     seconds ++;
-                    time= 0.0f;
+                    currentTime = 0.0f;
                 }
                 if (ImGui::Button("Stop"))
                     scene->play = false;
@@ -61,7 +61,7 @@ void UserInterface::render(const std::shared_ptr<Scene> & scene, float deltaTime
             if (ImGui::Button("Start")) {
                 scene->save();
                 frameCount = 0;
-                time = 0;
+                currentTime= 0;
                 seconds = 0;
             }
         }
@@ -70,7 +70,7 @@ void UserInterface::render(const std::shared_ptr<Scene> & scene, float deltaTime
             float bounds[3] = {scene->boundaries.x,
                                scene->boundaries.y,
                                scene->boundaries.z};
-            ImGui::DragFloat3("bounds", bounds,0.02f, 1.0f, 25.0f);
+            ImGui::DragFloat3("bounds", bounds,0.02f, 1.0f, 40.0f);
             scene->setBoundaries(glm::vec3(bounds[0], bounds[1], bounds[2]));
             float gravity[3] = {scene->gravity.x,
                                 scene->gravity.y,
@@ -93,8 +93,8 @@ void UserInterface::render(const std::shared_ptr<Scene> & scene, float deltaTime
             float pos[3] = {scene->fluidPosition.x, scene->fluidPosition.y, scene->fluidPosition.z};
             float col[3] = {scene->particleColor.x, scene->particleColor.y,scene->particleColor.z};
 
-            ImGui::DragFloat3("position", pos, 0.01f, 0.0f, 25.0f);
-            ImGui::SliderInt3("dimensions", dimensions, 0, 40);
+            ImGui::DragFloat3("position", pos, 0.01f, 0.0f, 40.0f);
+            ImGui::SliderInt3("dimensions", dimensions, 0, 50);
             ImGui::ColorEdit3("color", col);
             float viscosity = scene->viscosity;
             ImGui::DragFloat("viscosity", &viscosity,0.02f, 0.0f, 60.0f);

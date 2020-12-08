@@ -10,8 +10,8 @@
 Scene::Scene(const std::shared_ptr<Camera> & camera) {
     this->simulation =  std::make_shared<Simulation>(particleRadius);
     this->renderer = std::make_shared<Renderer>(camera);
-    setBoundaries(glm::vec3(12.0f));
-    setFluid(glm::vec3(6.0f), glm::vec3(20));
+    setBoundaries(glm::vec3(16.0f));
+    setFluid(glm::vec3(16.0f)/2.0f, glm::vec3(30));
     setMass(particleMass);
     setViscosity(viscosity);
     setGravity(gravity);

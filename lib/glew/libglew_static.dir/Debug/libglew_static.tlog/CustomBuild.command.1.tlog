@@ -1,0 +1,10 @@
+^D:\DESKTOP\WORKSPACE\COMP-477-PROJECT\LIB\GLEW\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Desktop/Workspace/comp-477-project -BD:/Desktop/Workspace/comp-477-project --check-stamp-file D:/Desktop/Workspace/comp-477-project/lib/glew/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
